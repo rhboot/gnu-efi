@@ -38,7 +38,7 @@ typedef int32_t             intptr_t;
  * This prevents GCC from emitting GOT based relocations, and use R_ARM_REL32
  * relative relocations instead, which are more suitable for static binaries.
  */
-#ifdef __GNUC__
+#if defined(__GNUC__) && !__STDC_HOSTED__
 #pragma GCC visibility push (hidden)
 #endif
 
