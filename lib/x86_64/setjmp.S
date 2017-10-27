@@ -1,10 +1,14 @@
 	.text
 	.globl	setjmp
-#ifndef __MINGW32__
+
+#ifndef __APPLE__
+# ifndef __MINGW32__
 	.type setjmp, @function
-#else
+# else
 	.def setjmp; .scl 2; .type 32; .endef
+# endif
 #endif
+
 setjmp:
 	pop	%rsi
 	movq	%rbx,0x00(%rdi)
@@ -20,11 +24,14 @@ setjmp:
 	ret
 
 	.globl	longjmp
-#ifndef __MINGW32__
+#ifndef __APPLE__
+# ifndef __MINGW32__
 	.type	longjmp, @function
-#else
+# else
 	.def longjmp; .scl 2; .type 32; .endef
+# endif
 #endif
+
 longjmp:
 	movl	%esi, %eax
 	movq	0x00(%rdi), %rbx
