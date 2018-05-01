@@ -15,6 +15,8 @@
  * either version 2 of the License, or (at your option) any later version.
  */
 
+#ifndef GNU_EFI_AA64_EFI_BIND_H
+#define GNU_EFI_AA64_EFI_BIND_H
 #if !defined(_MSC_VER) && (!defined(__STDC_VERSION__) || (__STDC_VERSION__ < 199901L )) && !defined(__cplusplus)
 
 // ANSI C 1999/2000 stdint.h integer width declarations
@@ -156,3 +158,4 @@ typedef uint64_t   UINTN;
 
 #define uefi_call_wrapper(func, va_num, ...) func(__VA_ARGS__)
 #define EFI_FUNCTION
+#endif /* GNU_EFI_AA64_EFI_BIND_H */

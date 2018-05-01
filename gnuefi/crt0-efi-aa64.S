@@ -1,5 +1,5 @@
 /*
- * crt0-efi-aarch64.S - PE/COFF header for AArch64 EFI applications
+ * crt0-efi-aa64.S - PE/COFF header for AArch64 EFI applications
  *
  * Copright (C) 2014 Linaro Ltd. <ard.biesheuvel@linaro.org>
  *

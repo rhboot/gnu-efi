@@ -16,8 +16,8 @@ Abstract:
 Revision History
 
 --*/
-#ifndef X86_64_EFI_BIND
-#define X86_64_EFI_BIND
+#ifndef X64_EFI_BIND
+#define X64_EFI_BIND
 #ifndef __GNUC__
 #pragma pack()
 #endif

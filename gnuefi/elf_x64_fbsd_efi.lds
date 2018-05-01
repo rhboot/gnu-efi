@@ -1,5 +1,5 @@
-/* Same as elf_x86_64_fbsd_efi.lds, except for OUTPUT_FORMAT below - KEEP IN SYNC */
-OUTPUT_FORMAT("elf64-x86-64", "elf64-x86-64", "elf64-x86-64")
+/* Same as elf_x64_efi.lds, except for OUTPUT_FORMAT below - KEEP IN SYNC */
+OUTPUT_FORMAT("elf64-x86-64-freebsd", "elf64-x86-64-freebsd", "elf64-x86-64-freebsd")
 OUTPUT_ARCH(i386:x86-64)
 ENTRY(_start)
 SECTIONS
@@ -19,13 +19,10 @@ SECTIONS
   {
    _text = .;
    *(.text)
-   *(.text.*)
-   *(.gnu.linkonce.t.*)
    . = ALIGN(16);
   }
   _etext = .;
   _text_size = . - _text;
-  . = ALIGN(4096);
   .reloc :
   {
    *(.reloc)
@@ -50,8 +47,6 @@ SECTIONS
   }
   .note.gnu.build-id : { *(.note.gnu.build-id) }
 
-  _edata = .;
-  _data_size = . - _etext;
   . = ALIGN(4096);
   .dynamic  : { *(.dynamic) }
   . = ALIGN(4096);
@@ -61,6 +56,8 @@ SECTIONS
     *(.rela.got)
     *(.rela.stab)
   }
+  _edata = .;
+  _data_size = . - _etext;
   . = ALIGN(4096);
   .dynsym   : { *(.dynsym) }
   . = ALIGN(4096);
@@ -69,8 +66,5 @@ SECTIONS
   .ignored.reloc :
   {
     *(.rela.reloc)
-    *(.eh_frame)
-    *(.note.GNU-stack)
   }
-  .comment 0 : { *(.comment) }
 }
