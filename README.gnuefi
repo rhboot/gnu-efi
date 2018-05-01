@@ -100,7 +100,7 @@ the appropriate compiler, assembler, linker, ar, and ranlib binaries,
 respectively.
 
 If you're working in a cross-development environment, be sure to set
-macro ARCH to the desired target architecture ("ia32" for x86, "x86_64" for
+macro ARCH to the desired target architecture ("ia32" for x86, "x64" for
 x86_64 and "ia64" for IA-64).  For convenience, this can also be done from
 the make command line (e.g., "make ARCH=ia64").
 
@@ -225,7 +225,7 @@ environment addresses each of these issues.
 In order to satisfy the COFF constraint of page-sized and page-aligned
 sections, the GNU EFI build environment uses the special linker script
 in gnuefi/elf_$(ARCH)_efi.lds where $(ARCH) is the target architecture
-("ia32" for x86, "x86_64" for x86_64 and "ia64" for IA-64).
+("ia32" for x86, "x64" for x86_64 and "ia64" for IA-64).
 This script is set up to create only eight COFF section, each page aligned
 and page sized.These eight sections are used to group together the much
 greater number of sections that are typically present in ELF object files.
@@ -319,7 +319,7 @@ environment is to:
 
 The self-relocator is of course architecture dependent.  The x86
 version can be found in gnuefi/reloc_ia32.c, the x86_64 version
-can be found in gnuefi/reloc_x86_64.c and the IA-64 version can be
+can be found in gnuefi/reloc_x64.c and the IA-64 version can be
 found in gnuefi/reloc_ia64.S.
 
 The self-relocator operates as follows: the startup code invokes it

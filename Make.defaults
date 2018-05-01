@@ -62,17 +62,32 @@ OBJCOPY      := $(prefix)$(CROSS_COMPILE)objcopy
 
 # Host/target identification
 OS           := $(shell uname -s)
-HOSTARCH     ?= $(shell $(HOSTCC) -dumpmachine | cut -f1 -d- | sed -e s,i[3456789]86,ia32, -e 's,armv[67].*,arm,' )
-ARCH         ?= $(shell $(HOSTCC) -dumpmachine | cut -f1 -d- | sed -e s,i[3456789]86,ia32, -e 's,armv[67].*,arm,' )
+HOSTARCH     ?= $(shell $(HOSTCC) -dumpmachine | cut -f1 -d- | sed \
+			-e s,i[3456789]86,ia32, \
+			-e s,amd64,x64, -e s,x86_64,x64, \
+			-e s,aarch64,aa64, \
+			-e 's,armv[[:digit:]].*,arm,' \
+			)
+ARCH         ?= $(shell $(HOSTCC) -dumpmachine | cut -f1 -d- | sed \
+			-e s,i[3456789]86,ia32, \
+			-e s,amd64,x64, -e s,x86_64,x64, \
+			-e s,aarch64,aa64, \
+			-e 's,armv[[:digit:]].*,arm,' \
+			)
+BFD_ARCH     ?= $(shell $(HOSTCC) -dumpmachine | cut -f1 -d- | sed \
+			-e s,i[3456789]86,ia32, \
+			-e s,amd64,x86_64, \
+			-e 's,armv[[:digit:]].*,arm,' \
+			)
 
 # Get ARCH from the compiler if cross compiling
 ifneq ($(CROSS_COMPILE),)
-  override ARCH := $(shell $(CC) -dumpmachine | cut -f1 -d-| sed -e s,i[3456789]86,ia32, -e 's,armv[67].*,arm,' )
-endif
-
-# FreeBSD (and possibly others) reports amd64 instead of x86_64
-ifeq ($(ARCH),amd64)
-  override ARCH := x86_64
+  override ARCH := $(shell $(CC) -dumpmachine | cut -f1 -d- | sed \
+			-e s,i[3456789]86,ia32, \
+			-e s,amd64,x64, -e s,x86_64,x64, \
+			-e s,aarch64,aa64, \
+			-e 's,armv[[:digit:]].*,arm,' \
+			)
 endif
 
 #
@@ -95,12 +110,12 @@ endif
 
 ifeq ($(ARCH),ia32)
   CFLAGS += -mno-mmx -mno-sse
-  ifeq ($(HOSTARCH),x86_64)
+  ifeq ($(HOSTARCH),x64)
     ARCH3264 = -m32
   endif
 endif
 
-ifeq ($(ARCH),x86_64)
+ifeq ($(ARCH),x64)
   GCCVERSION   := $(shell $(CC) -dumpversion | cut -f1 -d.)
   GCCMINOR     := $(shell $(CC) -dumpversion | cut -f2 -d.)
   USING_CLANG  := $(shell $(CC) -v 2>&1 | grep -q 'clang version' && echo clang)
@@ -122,7 +137,7 @@ ifeq ($(ARCH),x86_64)
   endif
 endif
 
-ifneq (,$(filter $(ARCH),ia32 x86_64))
+ifneq (,$(filter $(ARCH),ia32 x64))
   # Disable AVX, if the compiler supports that.
   CC_CAN_DISABLE_AVX=$(shell $(CC) -Werror -c -o /dev/null -xc -mno-avx - </dev/null >/dev/null 2>&1 && echo 1)
   ifeq ($(CC_CAN_DISABLE_AVX), 1)
@@ -139,7 +154,7 @@ endif
 # Set HAVE_EFI_OBJCOPY if objcopy understands --target efi-[app|bsdrv|rtdrv],
 # otherwise we need to compose the PE/COFF header using the assembler
 #
-ifneq ($(ARCH),aarch64)
+ifneq ($(ARCH),aa64)
 ifneq ($(ARCH),arm)
 ifneq ($(ARCH),mips64el)
 export HAVE_EFI_OBJCOPY=y

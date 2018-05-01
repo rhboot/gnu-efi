@@ -53,7 +53,7 @@ ifeq ($(ARCH),ia64)
 FILES += $(ARCH)/salpal $(ARCH)/palproc
 endif
 
-ifeq ($(ARCH),x86_64)
+ifeq ($(ARCH),x64)
 FILES += $(ARCH)/callwrap $(ARCH)/efi_stub
 endif
 
@@ -64,7 +64,7 @@ endif
 
 OBJS  = $(FILES:%=%.o)
 
-SUBDIRS = ia32 x86_64 ia64 aarch64 arm mips64el runtime
+SUBDIRS = ia32 x64 ia64 aa64 arm mips64el runtime
 
 LIBDIRINSTALL = $(INSTALLROOT)$(LIBDIR)
 

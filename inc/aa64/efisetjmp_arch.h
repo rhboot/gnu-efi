@@ -1,5 +1,5 @@
-#ifndef GNU_EFI_AARCH64_SETJMP_H
-#define GNU_EFI_AARCH64_SETJMP_H
+#ifndef GNU_EFI_AA64_SETJMP_H
+#define GNU_EFI_AA64_SETJMP_H
 
 #define JMPBUF_ALIGN 8
 
@@ -30,4 +30,4 @@ typedef struct {
 	UINT64	D15;
 } ALIGN(JMPBUF_ALIGN) jmp_buf[1];
 
-#endif /* GNU_EFI_AARCH64_SETJMP_H */
+#endif /* GNU_EFI_AA64_SETJMP_H */

@@ -1,7 +1,8 @@
-/* reloc_aarch64.c - position independent x86 ELF shared object relocator
-   Copyright (C) 2014 Linaro Ltd. <ard.biesheuvel@linaro.org>
+/* crt0-efi-x64.S - x86_64 EFI startup code.
    Copyright (C) 1999 Hewlett-Packard Co.
 	Contributed by David Mosberger <davidm@hpl.hp.com>.
+   Copyright (C) 2005 Intel Co.
+	Contributed by Fenghua Yu <fenghua.yu@intel.com>.
 
     All rights reserved.
 
@@ -33,65 +34,43 @@
     THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
     SUCH DAMAGE.
 */
+	.text
+	.align 4
 
-#include <efi.h>
-#include <efilib.h>
+	.globl _start
+_start:
+	subq $8, %rsp
+	pushq %rcx
+	pushq %rdx
 
-#include <elf.h>
+0:
+	lea ImageBase(%rip), %rdi
+	lea _DYNAMIC(%rip), %rsi
 
-EFI_STATUS _relocate (long ldbase, Elf64_Dyn *dyn,
-		      EFI_HANDLE image EFI_UNUSED,
-		      EFI_SYSTEM_TABLE *systab EFI_UNUSED)
-{
-	long relsz = 0, relent = 0;
-	Elf64_Rela *rel = 0;
-	unsigned long *addr;
-	int i;
+	popq %rcx
+	popq %rdx
+	pushq %rcx
+	pushq %rdx
+	call _relocate
 
-	for (i = 0; dyn[i].d_tag != DT_NULL; ++i) {
-		switch (dyn[i].d_tag) {
-			case DT_RELA:
-				rel = (Elf64_Rela*)
-					((unsigned long)dyn[i].d_un.d_ptr
-					 + ldbase);
-				break;
+	popq %rdi
+	popq %rsi
 
-			case DT_RELASZ:
-				relsz = dyn[i].d_un.d_val;
-				break;
+	call efi_main
+	addq $8, %rsp
 
-			case DT_RELAENT:
-				relent = dyn[i].d_un.d_val;
-				break;
+.exit:	
+  	ret
 
-			default:
-				break;
-		}
-	}
+ 	// hand-craft a dummy .reloc section so EFI knows it's a relocatable executable:
+ 
+ 	.data
+dummy:	.long	0
 
-	if (!rel && relent == 0)
-		return EFI_SUCCESS;
+#define IMAGE_REL_ABSOLUTE	0
+ 	.section .reloc, "a"
+label1:
+	.long	dummy-label1				// Page RVA
+ 	.long	10					// Block Size (2*4+2)
+	.word	(IMAGE_REL_ABSOLUTE<<12) +  0		// reloc for dummy
 
-	if (!rel || relent == 0)
-		return EFI_LOAD_ERROR;
-
-	while (relsz > 0) {
-		/* apply the relocs */
-		switch (ELF64_R_TYPE (rel->r_info)) {
-			case R_AARCH64_NONE:
-				break;
-
-			case R_AARCH64_RELATIVE:
-				addr = (unsigned long *)
-					(ldbase + rel->r_offset);
-				*addr = ldbase + rel->r_addend;
-				break;
-
-			default:
-				break;
-		}
-		rel = (Elf64_Rela*) ((char *) rel + relent);
-		relsz -= relent;
-	}
-	return EFI_SUCCESS;
-}

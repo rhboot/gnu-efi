@@ -1,4 +1,4 @@
-/* reloc_x86_64.c - position independent x86_64 ELF shared object relocator
+/* reloc_x64.c - position independent x86_64 ELF shared object relocator
    Copyright (C) 1999 Hewlett-Packard Co.
 	Contributed by David Mosberger <davidm@hpl.hp.com>.
    Copyright (C) 2005 Intel Co.
