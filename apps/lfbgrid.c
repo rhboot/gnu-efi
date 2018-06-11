@@ -88,7 +88,8 @@ draw_boxes(EFI_GRAPHICS_OUTPUT_PROTOCOL *gop)
 		if (CompareMem(info, gop->Mode->Info, sizeof (*info)))
 			continue;
 
-		NumPixels = info->VerticalResolution * info->PixelsPerScanLine;
+		NumPixels = (UINTN)info->VerticalResolution
+                            * (UINTN)info->PixelsPerScanLine;
 		BufferSize = NumPixels * sizeof(UINT32);
 		if (BufferSize == gop->Mode->FrameBufferSize) {
 			CopySize = BufferSize;
