@@ -108,10 +108,10 @@ the make command line (e.g., "make ARCH=ia64").
 ** Building
 
 To build the sample EFI applications provided in subdirectory "apps",
-simply invoke "make" in the toplevel directory (the directory
+simply invoke "make apps" in the toplevel directory (the directory
 containing this README file).  This should build lib/libefi.a and
 gnuefi/libgnuefi.a first and then all the EFI applications such as a
-apps/t6.efi.
+x86_64/apps/t6.efi.
 
 
 ** Running
