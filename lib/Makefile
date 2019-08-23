@@ -44,8 +44,8 @@ TOPDIR = $(SRCDIR)/..
 
 CDIR = $(TOPDIR)/..
 FILES = boxdraw smbios console crc data debug dpath  \
-        error event exit guid hand hw init lock   \
-        misc pause print sread str cmdline\
+        entry error event exit guid hand hw init lock   \
+        misc pause print sread str cmdline \
 	runtime/rtlock runtime/efirtlib runtime/rtstr runtime/vm runtime/rtdata  \
 	$(ARCH)/initplat $(ARCH)/math $(ARCH)/setjmp
 
@@ -62,7 +62,7 @@ FILES += $(ARCH)/uldiv $(ARCH)/ldivmod $(ARCH)/div $(ARCH)/llsl $(ARCH)/llsr \
 	 $(ARCH)/mullu
 endif
 
-OBJS  = $(FILES:%=%.o)
+OBJS  = $(FILES:%=%.o) ctors.o
 
 SUBDIRS = ia32 x64 ia64 aa64 arm mips64el runtime
 
