@@ -20,9 +20,8 @@ Revision History
 
 --*/
 
-typedef UINT16          CHAR16;
-typedef UINT8           CHAR8;
-typedef UINT8           BOOLEAN;
+typedef unsigned char BOOLEAN;
+
 #ifndef CONST
    #define CONST const
 #endif
@@ -194,7 +193,7 @@ typedef struct {
 // International Language
 //
 
-typedef UINT8   ISO_639_2;
+typedef CHAR8 ISO_639_2;
 #define ISO_639_2_ENTRY_SIZE    3
 
 //

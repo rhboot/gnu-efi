@@ -43,6 +43,9 @@ typedef int64_t             intptr_t;
 #ifndef __WCHAR_TYPE__
 # define __WCHAR_TYPE__ short
 #endif
+#ifndef __CHAR16_TYPE__
+# define __CHAR16_TYPE__ unsigned short
+#endif
 
 typedef uint64_t   UINT64;
 typedef int64_t    INT64;
@@ -51,9 +54,13 @@ typedef uint32_t   UINT32;
 typedef int32_t    INT32;
 
 typedef uint16_t   UINT16;
+typedef __CHAR16_TYPE__ CHAR16;
 typedef int16_t    INT16;
+
 typedef uint8_t    UINT8;
+typedef char       CHAR8;
 typedef int8_t     INT8;
+
 typedef __WCHAR_TYPE__ WCHAR;
 
 #undef VOID
