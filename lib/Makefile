@@ -66,7 +66,7 @@ OBJS  = $(FILES:%=%.o) ctors.o
 
 SUBDIRS = $(ARCHES) runtime
 
-LIBDIRINSTALL = $(INSTALLROOT)$(LIBDIR)
+LIBDIRINSTALL ?= $(INSTALLROOT)$(LIBDIR)/gnuefi/$(ARCH)
 
 all: libsubdirs libefi.a
 
@@ -87,6 +87,9 @@ $(LIBDIRINSTALL)/libefi.a: libefi.a | $(LIBDIRINSTALL)
 	$(INSTALL) -m 644 $< $(dir $@)
 
 install: $(LIBDIRINSTALL)/libefi.a
+
+install_compat: install
+	$(SYMLINK) gnuefi/$(ARCH)/libefi.a $(INSTALLROOT)$(LIBDIR)/libefi.a
 
 include $(SRCDIR)/../Make.rules
 

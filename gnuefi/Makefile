@@ -60,16 +60,30 @@ clean:
 	@rm -vf $(TARGETS) *~ *.o $(OBJS)
 
 install:
-	mkdir -p $(INSTALLROOT)$(LIBDIR)
-	$(INSTALL) -m 644 $(TARGETS) $(INSTALLROOT)$(LIBDIR)
+	mkdir -p $(INSTALLROOT)$(LIBDIR)/gnuefi/$(ARCH)
+	$(INSTALL) -m 644 -t $(INSTALLROOT)$(LIBDIR)/gnuefi/$(ARCH)/ $(TARGETS)
 ifneq (,$(findstring FreeBSD,$(OS)))
  ifeq ($(ARCH),x64)
-	$(INSTALL) -m 644 $(SRCDIR)/elf_$(ARCH)_fbsd_efi.lds $(INSTALLROOT)$(LIBDIR)
+	$(INSTALL) -m 644 $(SRCDIR)/elf_$(ARCH)_fbsd_efi.lds $(INSTALLROOT)$(LIBDIR)/gnuefi/$(ARCH)
  else
-	$(INSTALL) -m 644 $(SRCDIR)/elf_$(ARCH)_efi.lds $(INSTALLROOT)$(LIBDIR)
+	$(INSTALL) -m 644 $(SRCDIR)/elf_$(ARCH)_efi.lds $(INSTALLROOT)$(LIBDIR)/gnuefi/$(ARCH)
  endif
 else
-	$(INSTALL) -m 644 $(SRCDIR)/elf_$(ARCH)_efi.lds $(INSTALLROOT)$(LIBDIR)
+	$(INSTALL) -m 644 $(SRCDIR)/elf_$(ARCH)_efi.lds $(INSTALLROOT)$(LIBDIR)/gnuefi/$(ARCH)
+endif
+
+install_compat: install
+	mkdir -p $(INSTALLROOT)$(LIBDIR)
+	$(SYMLINK) gnuefi/$(ARCH)/libgnuefi.a $(INSTALLROOT)$(LIBDIR)/libgnuefi.a
+	$(SYMLINK) gnuefi/$(ARCH)/crt0-efi-$(ARCH).o $(INSTALLROOT)$(LIBDIR)/crt0-efi-$(BFD_ARCH).o
+ifneq (,$(findstring FreeBSD,$(OS)))
+ ifeq ($(ARCH),x64)
+	$(SYMLINK) gnuefi/$(ARCH)/elf_$(ARCH)_fbsd_efi.lds $(INSTALLROOT)$(LIBDIR)/elf_$(BFD_ARCH)_fbsd_efi.lds
+ else
+	$(SYMLINK) gnuefi/$(ARCH)/elf_$(ARCH)_efi.lds $(INSTALLROOT)$(LIBDIR)/elf_$(BFD_ARCH)_efi.lds
+ endif
+else
+	$(SYMLINK) gnuefi/$(ARCH)/elf_$(ARCH)_efi.lds $(INSTALLROOT)$(LIBDIR)/elf_$(BFD_ARCH)_efi.lds
 endif
 
 include $(SRCDIR)/../Make.rules

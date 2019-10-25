@@ -72,6 +72,7 @@ LD           := $(prefix)$(CROSS_COMPILE)ld
 AR           := $(prefix)$(CROSS_COMPILE)ar
 RANLIB       := $(prefix)$(CROSS_COMPILE)ranlib
 OBJCOPY      := $(prefix)$(CROSS_COMPILE)objcopy
+SYMLINK      := ln -vfs
 
 
 # Host/target identification
