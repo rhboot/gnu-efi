@@ -1,0 +1,7 @@
+inc/inc.mak binary
+inc/make.inf binary
+inc/makefile.hdr binary
+inc/protocol/efidbg.h binary
+inc/protocol/ia64/eficontext.h binary
+inc/protocol/make.inf binary
+inc/protocol/makefile.hdr binary
