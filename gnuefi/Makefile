@@ -37,12 +37,10 @@
 SRCDIR = .
 
 VPATH = $(SRCDIR)
+TOPDIR = $(SRCDIR)/..
 
 include $(SRCDIR)/../Make.defaults
 
-TOPDIR = $(SRCDIR)/..
-
-CDIR=$(TOPDIR)/..
 FILES	= reloc_$(ARCH)  
 
 OBJS	= $(FILES:%=%.o)
