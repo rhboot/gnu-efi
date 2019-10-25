@@ -91,6 +91,6 @@ ctors_test.so : ctors_fns.o ctors_test.o
 clean:
 	@rm -vf $(TARGETS) *~ *.o *.so
 
-.PHONY: install
+.PHONY: install install_compat
 
 include $(SRCDIR)/../Make.rules

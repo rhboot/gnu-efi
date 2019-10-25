@@ -87,10 +87,10 @@ clean:
 		fi; \
 	done
 
-install:
+install install_compat:
 	@set -e ; for d in $(SUBDIRS); do \
 		mkdir -p $(OBJDIR)/$$d; \
-		$(MAKE) -C $(OBJDIR)/$$d -f $(SRCDIR)/$$d/Makefile SRCDIR=$(SRCDIR)/$$d install; done
+		$(MAKE) -C $(OBJDIR)/$$d -f $(SRCDIR)/$$d/Makefile SRCDIR=$(SRCDIR)/$$d $@ ; done
 
 .PHONY:	$(SUBDIRS) clean depend
 
