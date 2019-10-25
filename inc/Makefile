@@ -9,15 +9,18 @@ all:
 
 clean:
 
+SOURCE=$(realpath $(SRCDIR))
+DEST=$(INSTALLROOT)$(PREFIX)/include/efi
+INCLUDEDIRS=$(sort $(shell find $(SOURCE) -type d))
+
 install:
-	mkdir -p $(INSTALLROOT)$(PREFIX)/include/efi
-	mkdir -p $(INSTALLROOT)$(PREFIX)/include/efi/protocol
-	mkdir -p $(INSTALLROOT)$(PREFIX)/include/efi/$(ARCH)
-	$(INSTALL) -m 644 $(SRCDIR)/*.h $(INSTALLROOT)$(PREFIX)/include/efi
-	$(INSTALL) -m 644 $(SRCDIR)/protocol/*.h $(INSTALLROOT)$(PREFIX)/include/efi/protocol
-	$(INSTALL) -m 644 $(SRCDIR)/$(ARCH)/*.h $(INSTALLROOT)$(PREFIX)/include/efi/$(ARCH)
+	@$(foreach d,$(INCLUDEDIRS), \
+		$(INSTALL) -v -m 755 -d $(subst $(SOURCE),$(DEST),$(d)); \
+		$(INSTALL) -v -m 644 -t $(subst $(SOURCE),$(DEST),$(d)) $(wildcard $(d)/*.h); \
+	)
 
 install_compat: install
-	@if [ ! -h $(DEST)/$(BFD_ARCH) ]; then $(SYMLINK) $(ARCH) $(INSTALLROOT)$(PREFIX)/include/efi/$(BFD_ARCH) ; fi
+	@if [ ! -h $(DEST)/x86_64 ]; then $(SYMLINK) x64/ $(DEST)/x86_64 ; fi
+	@if [ ! -h $(DEST)/aarch64 ]; then $(SYMLINK) aa64/ $(DEST)/aarch64 ; fi
 
 include $(SRCDIR)/../Make.rules
