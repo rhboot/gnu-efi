@@ -47,7 +47,19 @@ ARCHES=aa64 arm ia32 ia64 mips64el x64
 # Where to install the package. GNU-EFI will create and access
 # lib and include under the root
 #
-INSTALLROOT  := /
+DESTDIR ?= /
+ifeq ($(origin INSTALLROOT),undefined)
+INSTALLROOT = $(DESTDIR)
+endif
+
+empty :=
+space := $(empty) $(empty)
+stripped = $(subst $(space),/,$(strip $(subst /,$(space),$(1))))
+unstripped = $(subst $(space),/,$(subst /,$(space),$(1)))
+is_absolute = $(subst $(call stripped,$(1)),$(empty),$(call unstripped,$(1)))
+
+override INSTALLROOT:=$(if $(call is_absolute,$(INSTALLROOT)),,$(TOPDIR)/)$(INSTALLROOT)
+
 PREFIX       := /usr/local
 LIBDIR 	     := $(PREFIX)/lib
 INSTALL	     := install
