@@ -4,3 +4,9 @@
 *.a
 *.tar.*
 *.tar
+aa64
+arm
+ia32
+ia64
+mips64el
+x64
