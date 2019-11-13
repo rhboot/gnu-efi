@@ -40,6 +40,7 @@ VPATH = $(SRCDIR)
 TOPDIR = $(SRCDIR)/..
 
 include $(SRCDIR)/../Make.defaults
+include $(SRCDIR)/../inc/$(ARCH).mk
 
 LINUX_HEADERS	= /usr/src/sys/build
 CPPFLAGS	+= -D__KERNEL__ -I$(LINUX_HEADERS)/include
@@ -67,9 +68,9 @@ TARGET_RTDRIVERS =
 
 ifneq ($(HAVE_EFI_OBJCOPY),)
 
-FORMAT		:= --target efi-app-$(BFD_ARCH)
-$(TARGET_BSDRIVERS): FORMAT=--target efi-bsdrv-$(BFD_ARCH)
-$(TARGET_RTDRIVERS): FORMAT=--target efi-rtdrv-$(BFD_ARCH)
+FORMAT		:= --target efi-app-$(EFI_BFDARCH)
+$(TARGET_BSDRIVERS): FORMAT=--target efi-bsdrv-$(EFI_BFDARCH)
+$(TARGET_RTDRIVERS): FORMAT=--target efi-rtdrv-$(EFI_BFDARCH)
 
 else
 

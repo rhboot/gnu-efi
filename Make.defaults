@@ -82,12 +82,14 @@ HOSTARCH     ?= $(shell $(HOSTCC) -dumpmachine | cut -f1 -d- | sed \
 			-e s,amd64,x64, -e s,x86_64,x64, \
 			-e s,aarch64,aa64, \
 			-e 's,armv[[:digit:]].*,arm,' \
+			-e 's,mips64.*,mips64el,g' \
 			)
 ARCH         ?= $(shell $(HOSTCC) -dumpmachine | cut -f1 -d- | sed \
 			-e s,i[3456789]86,ia32, \
 			-e s,amd64,x64, -e s,x86_64,x64, \
 			-e s,aarch64,aa64, \
 			-e 's,armv[[:digit:]].*,arm,' \
+			-e 's,mips64.*,mips64el,g' \
 			)
 BFD_ARCH     ?= $(shell $(HOSTCC) -dumpmachine | cut -f1 -d- | sed \
 			-e s,i[3456789]86,ia32, \
@@ -102,6 +104,7 @@ ifneq ($(CROSS_COMPILE),)
 			-e s,amd64,x64, -e s,x86_64,x64, \
 			-e s,aarch64,aa64, \
 			-e 's,armv[[:digit:]].*,arm,' \
+			-e 's,mips64.*,mips64el,g' \
 			)
 endif
 
@@ -161,7 +164,8 @@ ifneq (,$(filter $(ARCH),ia32 x64))
 endif
 
 ifeq ($(ARCH),mips64el)
-  CFLAGS += -march=mips64r2
+  CFLAGS += -march=mips64r2 -EL
+  LDFLAGS += -EL
   ARCH3264 = -mabi=64
 endif
 

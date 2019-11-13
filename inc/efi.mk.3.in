@@ -1,0 +1,171 @@
+.TH efi.mk 3 "Thu Nov 21 2019"
+.SH NAME
+efi.mk
+.SH SYNOPSIS
+.nf
+.B include efi.mk
+.SH DESCRIPTION
+.ad l
+.nh
+The \fBgnu-efi\fR library provides a set of makefiles which produce \fBEFI\fR
+binaries on the supported platforms, as well as a number of make variables
+which can be set to control how each step gets built.  These can be set in your
+makefile or on the command line, but are normally set to reasonable defaults.
+Usually you'll just want to use the \fI+=\fR operator, as shown in the
+.BR EXAMPLES
+section below, rather than fully replacing these.
+.SS make variables
+.RS 4
+.TP
+.B \fBEFI_ARCH_CFLAGS\fR
+Architecture specific \fBgcc\fR command line options for building a \fI.efi.o\fR
+.TP
+.B \fBEFI_ARCH_LDFLAGS\fR
+Architecture specific \fBld\fR command line options for building the \fI.efi.so\fR
+.TP
+.B \fBEFI_ARCH_FORMAT\fR
+Architecture specific \fBobjcopy\fR arguments for building the final \fI.efi\fR binary
+.TP
+.B \fBCROSS_COMPILE\fR
+Compiler prefix for cross-compilation.  For example, "\fIaarch64-linux-gnu-\fR".
+.TP
+.B \fBEFI_CC\fR
+\p The C compiler.  Defaults to either \fI$(CROSS_COMPILE)gcc\fR or \fI$(CROSS_COMPILE)clang\fR,
+depending on what \fI$(CC)\fR was set to when \fBgnu-efi\fR was built.
+.TP
+.B \fBEFI_HOSTCC\fR
+Defaults to whatever \fI$(CC)\fR was set to when \fBgnu-efi\fR was built.
+.TP
+.B \fBEFI_HOSTARCH\fR
+One of \fIaa64\fR, \fIarm\fR, \fIia32\fR, \fIia64\fR, \fIx64\fR, or
+\fImips64el\fR, representing the \fBEFI\fR architecture name of the host machine
+during the build.
+.TP
+.B \fBEFI_ARCH\fR
+One of \fIaa64\fR, \fIarm\fR, \fIia32\fR, \fIia64\fR, \fIx64\fR, or
+\fImips64el\fR, representing the \fBEFI\fR architecture name of the target.
+.TP
+.B \fBEFI_BFDARCH\fR
+The architecture name for the BFD target for objcopy.
+.TP
+.B \fBEFI_ARCH_3264\fR
+Usually empty; if you're cross compiling, this will default to e.g. \fI-m64\fR if
+you're building for an \fIx64\fR target on an \fIi686\fR host.
+.TP
+.B \fBEFI_CC_INCLUDES\fR
+The list of default include path for the compiler, as a \fBgcc\fR command line
+argument.  Defaults to the output of \fI$(EFI_CC) $(EFI_ARCH_3264)
+-print-file-name=include\fR, for example
+\fI/usr/lib/gcc/x86_64-redhat-linux/9/include\fR.  Note that there is no
+\fI-I\fR prefix on these.
+.TP
+.B \fBEFI_INCLUDES\fR
+The \fBgnu-efi\fR include paths.  Note that there is no \fI-I\fR prefix on these.
+.TP
+.B \fBEFI_CPPFLAGS\fR
+Flags passed to \fBgcc\fR regardless of the build target.
+.TP
+.B \fBEFI_CFLAGS\fR
+Flags passed to \fBgcc\fR for building any binary target.  Defaults to
+\fI$(EFI_CPPFLAGS) $(EFI_ARCH_CFLAGS)\fR.
+.TP
+.B \fBEFI_LDSCRIPT\fR
+The linker script passed to \fBld -T\fR for linking \fI.efi.so\fR build targets.
+Defaults to \fI@@PREFIX@@/lib/gnuefi/$(EFI_ARCH)/efi.lds\fR.
+.TP
+.B \fBEFI_LIBGCC\fR
+The path to \fBlibgcc\fR.  Defaults to the result of
+\fI$(EFI_CC) $(EFI_ARCH_3264) -print-libgcc-file-name\fR
+.TP
+.B \fBEFI_LDFLAGS\fR
+Other command line to pass to \fBld\fR
+.ul
+before
+object names. Defaults to
+\fI-nostdlib --warn-common --no-undefined --fatal-warnings \
+--build-id=sha1 -shared -Bsymbolic -L@@PREFIX@@/lib/gnuefi/$(EFI_ARCH) \
+@@PREFIX@@/lib/gnuefi/$(EFI_ARCH)/crt0.o\fR
+.TP
+.B \fBEFI_CCLDFLAGS\fR
+Normally derived from \fI$(EFI_LDFLAGS)\fR.
+.TP
+.B \fBEFI_LDLIBS\fR
+Libraries to pass to \fBld\fR
+.ul
+after
+target object names.  Defaults
+to \fI-lefi -lgnuefi $(EFI_LIBGCC) -T $(EFI_LDSCRIPT)\fR
+.TP
+.B \fBEFI_CCLDLIBS\fR
+Derived from \fI$(EFI_LDLIBS)\fR.
+.TP
+.B \fBEFI_ARFLAGS\fR
+Flags to pass to ar to make a \fI.efi.a\fR target.  Defaults to "\fIrDv\fR".
+.TP
+.B \fBEFI_ASFLAGS\fR
+Flags to pass to gcc to make a \fI.efi.o\fR object from a \fI.S\fR file.
+.TP
+.B \fBEFI_OBJCOPY_FLAGS\fR
+Flags to pass to objcopy to make a \fI.efi\fR binary target.  Defaults to
+\fI--file-alignment 512 --section-alignment 4096 -D\fR
+.TP
+.B \fBEFI_BIN_SECTIONS\fR
+Names of sections to go into \fI.efi\fR binary targets.  If you have special
+sections, add them here.
+.TP
+.B \fBEFI_DEBUG_SECTIONS\fR
+Names of sections to go into \fI.efi.debug\fR targets.  If you have special
+debug sections, add them here.
+.RE
+.TP
+In addition, there are several make rules defined, which those variables affect
+as appropriate:
+.RS 4
+.TP
+.B \fB%.efi : %.efi.so\fB
+Build a \fI.efi\fR binary
+.TP
+.B \fB%.efi.debug : %efi.so\fR
+Build debuginfo
+.TP
+.B \fB%.efi.so :\fR
+Build the intermediate \fI.efi.so\fR to be linked as a \fI.efi\fR binary.  Add
+\fI.o\fR files as dependencies to a concrete \fI.efi.so\fR rule in order to
+define targets.
+.TP
+.B \fB%.efi.a :\fR
+Build an intermediate archive file for linking into a \fI.efi.so\fR
+.TP
+.B \fB%.efi.o : %.c\fR
+Build an object file from a \fI.c\fR file
+.TP
+.B \fB%.efi.o : %.S\fR
+Build an object file from a \fI.S\fR file
+.TP
+.B \fBefi_clean :\fR
+Remove all files in the current working directory with the suffixes
+\fI.efi\fR, \fI.efi.a\fR, \fI.efi.debug\fR, \fI.efi.o\fR, or \fI.efi.so\fR.
+.SH EXAMPLES
+This is a simple makefile used to build an \fBEFI\fR binary named \fIfoo.efi\fR from source files \fIfoo.c\fR and \fIbar.c\fR.  It includes the special section \fI.weird\fR in the final binary, and the name of that is defined within the \fI.c\fR source files using the macro \fIWEIRD_SECTION_NAME\fR:
+.RS 4
+\p include efi.mk
+.br
+\p all : foo.efi
+.br
+\p %.efi.o : | EFI_CFLAGS+=-DWEIRD_SECTION_NAME=\\".weird\\"
+.br
+\p foo.efi : | EFI_BIN_SECTIONS+=.weird
+.br
+foo.efi.so : foo.efi.o bar.efi.o
+.br
+\p clean : efi_clean
+.RE
+\p The following example shows how to cross-compile a binary for another architecture (in this case, \fIARM Aarch64\fR, which \fBEFI\fR calls \fIaa64\fR).  This assumes that you have the \fIcrt0.o\fR, \fIefi.lds\fR, \fIlibgnuefi.a\fR, and \fIlibefi.a\fR files for \fIAarch64\fR installed in \fI@@PREFIX@@/lib/gnuefi/aa64/\fR\.
+.RS 4
+\p $ make CROSS_COMPILE=aarch64-linux-gnu- EFI_ARCH=aa64 foo.efi
+.RE
+.fi
+.SH AUTHORS
+.nf
+Peter Jones <pjones@redhat.com>
+.fi

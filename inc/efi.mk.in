@@ -1,0 +1,126 @@
+#
+# efi.mk
+# Peter Jones, 2019-11-13 14:11
+#
+
+_efi_comma=,
+_efi_empty=
+_efi_space=$(_efi_empty) $(_efi_empty)
+
+CROSS_COMPILE ?=
+OBJCOPY ?= $(CROSS_COMPILE)objcopy
+LD ?= $(CROSS_COMPILE)ld
+
+EFI_OBJCOPY_GTE224  = $(shell expr `$(OBJCOPY) --version |grep ^"GNU objcopy" | sed 's/^.*\((.*)\|version\) //g' | cut -f1-2 -d.` \>= 2.24)
+
+EFI_CC ?= $(CROSS_COMPILE)@@CC@@
+EFI_HOSTCC ?= @@CC@@
+
+EFI_HOSTARCH ?= $(shell $(EFI_HOSTCC) -dumpmachine | cut -f1 -d- | \
+		sed \
+			-e s,i[3456789]86,ia32, \
+                        -e s,amd64,x64, \
+			-e s,x86_64,x64, \
+                        -e s,aarch64,aa64, \
+			-e 's,armv[[:digit:]].*,arm,' \
+                        )
+EFI_ARCH ?= $(shell $(EFI_CC) -dumpmachine | cut -f1 -d- | \
+		sed \
+			-e s,i[3456789]86,ia32, \
+                        -e s,amd64,x64, \
+			-e s,x86_64,x64, \
+                        -e s,aarch64,aa64, \
+			-e 's,armv[[:digit:]].*,arm,' \
+                        )
+EFI_BFDARCH ?= $(shell $(EFI_CC) -dumpmachine | cut -f1 -d- | \
+		sed \
+			-e s,i[3456789]86,ia32, \
+                        -e s,amd64,x86_64, \
+			-e 's,armv[[:digit:]].*,arm,' \
+                        )
+
+include efi/$(EFI_ARCH).mk
+
+GNUEFI_LIB_PATHS := $(sort @@LIBEFIDIR@@ @@GNUEFIDIR@@)
+GNUEFI_LDFLAGS := -nostdlib --warn-common --no-undefined --fatal-warnings \
+		  --build-id=sha1 -shared -Bsymbolic --exclude-libs ALL \
+		  $(foreach x,$(GNUEFI_LIB_PATHS),-L$(x)) @@GNUEFIDIR@@/crt0.o
+
+ifeq ($(origin EFI_CC_INCLUDES),undefined)
+EFI_CC_INCLUDES := $(foreach x,$(shell $(EFI_CC) $(EFI_ARCH_3264) -print-file-name=include),-I$(x))
+endif
+EFI_INCLUDES ?= -I@@INCDIR@@ -I@@INCDIR@@/$(EFI_ARCH) -I@@INCDIR@@/protocol
+EFI_CPPFLAGS ?= -ffreestanding -nostdlib -fpic \
+		$(EFI_INCLUDES) $(EFI_CC_INCLUDES) \
+		-DCONFIG_$(EFI_ARCH) -DCONFIG_ARCH=$(EFI_ARCH) \
+		-Wno-error=pragmas -fvisibility=hidden \
+		-fshort-wchar -fno-strict-aliasing -fno-stack-protector \
+		$(if $(findstring gcc,$(EFI_CC)),-fno-merge-all-constants,) \
+		$(EFI_ARCH_CPPFLAGS)
+EFI_CFLAGS ?= $(EFI_CPPFLAGS) $(EFI_ARCH_CFLAGS)
+ifeq ($(origin EFI_LDLIBS),undefined)
+EFI_LDLIBS := -lefi -lgnuefi
+endif
+ifeq ($(origin EFI_LDFLAGS),undefined)
+EFI_LDFLAGS := $(GNUEFI_LDFLAGS) $(EFI_ARCH_LDFLAGS)
+endif
+EFI_CCLDLIBS ?= $(foreach x,$(EFI_LDLIBS),$(x))
+EFI_CCLDFLAGS ?= $(foreach x,$(EFI_LDFLAGS),-Wl$(_efi_comma)$(x))
+EFI_ARFLAGS ?= rDv
+EFI_ASFLAGS ?= $(EFI_ARCH_3264)
+EFI_LIBGCC ?= $(shell $(EFI_CC) $(EFI_ARCH_3264) -print-libgcc-file-name)
+EFI_LDSCRIPT ?= @@GNUEFIDIR@@/efi.lds
+_EFI_CCLDLIBS = $(subst $(_efi_space),$(_efi_comma),-Wl --start-group $(foreach x,$(EFI_CCLDLIBS),$(x)) --end-group)
+
+EFI_BIN_SECTIONS ?= .text .sdata .data .dynamic .dynsym \
+		    .rel .rel.* .rela .rela.* .reloc \
+		    .eh_frame .note.gnu.build-id .ctf \
+		    $(EFI_ARCH_BIN_SECTIONS)
+
+EFI_DEBUG_SECTIONS ?= .debug* .eh_frame .note.gnu.build-id .ctf \
+		      $(EFI_ARCH_DEBUG_SECTIONS)
+EFI_OBJCOPY_FLAGS ?= --file-alignment 512 --section-alignment 4096 -D
+
+%.efi : %.efi.so
+ifneq ($(EFI_OBJCOPY_GTE224),1)
+        $(error objcopy >= 2.24 is required)
+endif
+	$(OBJCOPY) $(EFI_OBJCOPY_FLAGS) \
+		$(foreach x,$(EFI_BIN_SECTIONS),-j $(x)) \
+		$(EFI_ARCH_FORMAT) $*.efi.so $@
+
+%.efi.debug : %.efi.so
+ifneq ($(EFI_OBJCOPY_GTE224),1)
+        $(error objcopy >= 2.24 is required)
+endif
+	$(OBJCOPY) $(EFI_OBJCOPY_FLAGS) \
+		$(foreach x,$(EFI_DEBUG_SECTIONS),-j $(x)) \
+		$(EFI_ARCH_FORMAT) $*.efi.so $@
+
+%.efi.a :
+	$(AR) $(EFI_ARFLAGS) $@ $^
+
+%.efi.so :
+	$(EFI_CC) $(EFI_CFLAGS) $(EFI_CCLDFLAGS) -o $@ $^ $(_EFI_CCLDLIBS) $(EFI_LIBGCC) -T $(EFI_LDSCRIPT)
+
+%.efi.o : %.c
+	$(EFI_CC) $(EFI_CFLAGS) -c -o $@ $<
+
+%.efi.o : %.S
+	$(EFI_CC) $(EFI_CFLAGS) -c -o $@ $<
+
+efi_clean ::
+	@rm -vf *.efi.{a,debug,o,so} *.efi
+
+.PHONY: efi_clean
+
+export EFI_ARCH
+export EFI_ARCH_CCLDFLAGS EFI_ARCH_CFLAGS EFI_ARCH_CPPFLAGS EFI_ARCH_LDFLAGS
+export EFI_ARCH_CLANG_BUGS EFI_ARCH_CAN_DISABLE_AVX
+export EFI_ARCH_FORMAT EFI_ARCH_SUBSYSTEM EFI_ARCH_SUFFIX EFI_ARCH_SUFFIX_UPPER
+export EFI_ARCH_TIMESTAMP_LOCATION EFI_ARCH_3264
+export EFI_ARFLAGS EFI_ASFLAGS EFI_BFDARCH EFI_CC EFI_CFLAGS EFI_CPPFLAGS
+export EFI_LDFLAGS EFI_LDSCRIPT EFI_HOSTARCH EFI_HOSTCC EFI_INCLUDES
+export EFI_LIBGCC EFI_LIBS
+
+# vim:ft=make
