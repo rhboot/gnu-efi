@@ -64,7 +64,7 @@ endif
 
 OBJS  = $(FILES:%=%.o) ctors.o
 
-SUBDIRS = ia32 x64 ia64 aa64 arm mips64el runtime
+SUBDIRS = $(ARCHES) runtime
 
 LIBDIRINSTALL = $(INSTALLROOT)$(LIBDIR)
 
@@ -78,7 +78,7 @@ libefi.a: $(OBJS)
 	$(AR) $(ARFLAGS) $@ $^
 
 clean:
-	rm -f libefi.a *~ $(OBJS) */*.o
+	@rm -vf libefi.a *~ $(OBJS) */*.o
 
 $(LIBDIRINSTALL):
 	mkdir -p $@
