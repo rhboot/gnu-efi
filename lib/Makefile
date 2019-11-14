@@ -72,7 +72,7 @@ all: libsubdirs libefi.a
 
 .PHONY: libsubdirs
 libsubdirs:
-	for sdir in $(SUBDIRS); do mkdir -p $$sdir; done
+	@set -e ; for sdir in $(SUBDIRS); do mkdir -p $$sdir; done
 
 libefi.a: $(OBJS)
 	$(AR) $(ARFLAGS) $@ $^
