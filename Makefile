@@ -81,14 +81,14 @@ $(SUBDIRS):
 
 clean:
 	rm -f *~
-	@for d in $(SUBDIRS); do \
+	@set -e ; for d in $(SUBDIRS); do \
 		if [ -d $(OBJDIR)/$$d ]; then \
 			$(MAKE) -C $(OBJDIR)/$$d -f $(SRCDIR)/$$d/Makefile SRCDIR=$(SRCDIR)/$$d clean; \
 		fi; \
 	done
 
 install:
-	@for d in $(SUBDIRS); do \
+	@set -e ; for d in $(SUBDIRS); do \
 		mkdir -p $(OBJDIR)/$$d; \
 		$(MAKE) -C $(OBJDIR)/$$d -f $(SRCDIR)/$$d/Makefile SRCDIR=$(SRCDIR)/$$d install; done
 
