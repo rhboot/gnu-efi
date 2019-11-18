@@ -1239,6 +1239,20 @@ Returns:
                 PSETATTR(ps, ps->AttrNorm);
                 break;
 
+            case 'p':
+                Item.Width = sizeof(void *) == (8 ? 16 : 8) + 2;
+                Item.Pad = '0';
+                Item.Scratch[0] = ' ';
+                Item.Scratch[1] = ' ';
+                ValueToHex (
+                    Item.Scratch+2,
+                    Item.Long ? va_arg(ps->args, UINT64) : va_arg(ps->args, UINT32)
+                    );
+                Item.Scratch[0] = '0';
+                Item.Scratch[1] = 'x';
+                Item.Item.pw = Item.Scratch;
+                break;
+
             case 'r':
                 StatusToString (Item.Scratch, va_arg(ps->args, EFI_STATUS));
                 Item.Item.pw = Item.Scratch;
