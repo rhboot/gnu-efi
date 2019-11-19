@@ -193,10 +193,10 @@ endif
 INCDIR  += -I$(SRCDIR) -I$(TOPDIR)/inc -I$(TOPDIR)/inc/$(ARCH) \
            -I$(TOPDIR)/inc/protocol
 
-# Only enable -fpic for non MinGW compilers (unneeded on MinGW)
+# Only enable -fPIE for non MinGW compilers (unneeded on MinGW)
 GCCMACHINE := $(shell $(CC) -dumpmachine)
 ifneq (mingw32,$(findstring mingw32, $(GCCMACHINE)))
-  CFLAGS += -fpic
+  CFLAGS += -fPIE
 endif
 
 IS_FREEBSD = $(findstring FreeBSD, $(OS))
