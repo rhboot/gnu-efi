@@ -181,10 +181,6 @@ endif
 endif
 endif
 
-ifneq ($(ARCH),arm)
-export LIBGCC=$(shell $(CC) $(ARCH3264) -print-libgcc-file-name)
-endif
-
 ifeq ($(ARCH),arm)
 CFLAGS += -marm
 endif
@@ -223,3 +219,7 @@ endif
 ASFLAGS += $(ARCH3264)
 LDFLAGS	+= -nostdlib --warn-common --no-undefined --fatal-warnings \
 	   --build-id=sha1
+
+ifneq ($(ARCH),arm)
+export LIBGCC=$(shell $(CC) $(CFLAGS) $(ARCH3264) -print-libgcc-file-name)
+endif
