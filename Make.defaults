@@ -203,7 +203,7 @@ CFLAGS  += $(ARCH3264) -g -O2 -Wall -Wextra -Werror \
            -fshort-wchar -fno-strict-aliasing \
            -ffreestanding -fno-stack-protector
 else
-CFLAGS  += $(ARCH3264) -g -O2 -Wall -Wextra -Werror \
+CFLAGS  += $(ARCH3264) -g -O2 -Wall -Wextra -Wno-pointer-sign -Werror \
            -fshort-wchar -fno-strict-aliasing \
 	   -ffreestanding -fno-stack-protector -fno-stack-check \
            -fno-stack-check \
