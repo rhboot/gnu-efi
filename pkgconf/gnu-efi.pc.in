@@ -1,0 +1,10 @@
+efilib=@@PREFIX@@/lib/gnuefi/@@EFI_ARCH@@
+efiinc=@@INCLUDEDIR@@/efi
+cflags=@@CFLAGS@@
+ldflags=@@LDFLAGS@@
+
+Name: gnu-efi
+Description: Boot-time library for EFI applications
+Version: @@VERSION@@
+Libs: -T${efilib}/efi.lds -L${efilib} --start-group ${efilib}/libefi.a ${efilib}/libgnuefi.a ${efilib}/crt0.o --end-group ${ldflags}
+Cflags: -I${efiinc} -I${efiinc}/@@EFI_ARCH@@ -I${efiinc}/protocol ${cflags}

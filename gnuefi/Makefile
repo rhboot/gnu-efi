@@ -39,6 +39,7 @@ SRCDIR = .
 VPATH = $(SRCDIR)
 TOPDIR = $(SRCDIR)/..
 
+include $(SRCDIR)/../Make.version
 include $(SRCDIR)/../Make.defaults
 
 FILES	= reloc_$(ARCH)
@@ -64,7 +65,7 @@ install:
 	@$(INSTALL) -v -m 644 crt0-efi-$(ARCH).o $(INSTALLROOT)$(LIBDIR)/gnuefi/$(ARCH)/crt0.o
 ifneq (,$(findstring FreeBSD,$(OS)))
  ifeq ($(ARCH),x64)
-	@$(INSTALL) -v -m 644 $(SRCDIR)/elf_$(ARCH)_fbsd_efi.lds $(INSTALLROOT)$(LIBDIR)/gnuefi/$(ARCH)
+	@$(INSTALL) -v -m 644 $(SRCDIR)/elf_$(ARCH)_fbsd_efi.lds $(INSTALLROOT)$(LIBDIR)/gnuefi/$(ARCH)/efi.lds
  else
 	@$(INSTALL) -v -m 644 $(SRCDIR)/elf_$(ARCH)_efi.lds $(INSTALLROOT)$(LIBDIR)/gnuefi/$(ARCH)/efi.lds
  endif

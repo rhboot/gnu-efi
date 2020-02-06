@@ -1,0 +1,14 @@
+*.pc
+x64-efi-gnu.personality
+x86_64-efi-gnu.personality
+amd64-efi-gnu.personality
+ia32-efi-gnu.personality
+i386-efi-gnu.personality
+i686-efi-gnu.personality
+ia64-efi-gnu.personality
+armv6-efi-gnu.personality
+armv7-efi-gnu.personality
+arm-efi-gnu.personality
+aarch64-efi-gnu.personality
+aa64-efi-gnu.personality
+mips64el-efi-gnu.personality

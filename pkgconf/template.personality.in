@@ -1,0 +1,4 @@
+Triplet: @@TRIPLET_ARCH@@-efi-gnu
+DefaultSearchPaths: @@SHAREDIR@@/pkgconfig/@@EFI_ARCH@@-efi-gnu/
+SystemIncludePaths: @@INCLUDEDIR@@/efi/@@EFI_ARCH@@/
+SystemLibraryPaths: @@LIBDIR@@/gnuefi/@@EFI_ARCH@@/

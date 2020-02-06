@@ -1,5 +1,5 @@
 #
-#  Copyright (C) 1999-2007 Hewlett-Packard Co.
+#  Copyright (C) 1999-2001 Hewlett-Packard Co.
 #	Contributed by David Mosberger <davidm@hpl.hp.com>
 #	Contributed by Stephane Eranian <eranian@hpl.hp.com>
 #
@@ -34,50 +34,29 @@
 #    SUCH DAMAGE.
 #
 
-%.efi: %.so
-	$(OBJCOPY) -j .text -j .sdata -j .data -j .dynamic -j .dynsym -j .rel \
-		    -j .rela -j .rel.* -j .rela.* -j .rel* -j .rela* \
-		    -j .reloc $(FORMAT) $*.so $@
+SRCDIR = .
 
-%.efi.debug: %.so
-	$(OBJCOPY) -j .debug_info -j .debug_abbrev -j .debug_aranges \
-		-j .debug_line -j .debug_str -j .debug_ranges \
-		-j .note.gnu.build-id \
-		$(FORMAT) $*.so $@
+VPATH = $(SRCDIR)
+TOPDIR = $(SRCDIR)/..
 
-%.so: %.o
-	$(LD) $(LDFLAGS) $^ -o $@ $(LOADLIBES)
+include $(SRCDIR)/../Make.version
+include $(SRCDIR)/../Make.defaults
 
-%.o: %.c
-	$(CC) $(INCDIR) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+TARGETS	= gnu-efi-$(ARCH).pc \
+	  $(foreach arch,$(ARCH) $(ARCH_ALIASES),$(arch)-efi-gnu.personality)
 
-%.s: %.c
-	$(CC) $(INCDIR) $(CFLAGS) $(CPPFLAGS) -S $< -o $@
+all:	$(TARGETS)
 
-%.i: %.c
-	$(CC) $(INCDIR) $(CFLAGS) $(CPPFLAGS) -E $< -o $@
+clean:
+	@rm -vf $(TARGETS) *~
 
-%.o: %.S
-	$(CC) $(INCDIR) $(CFLAGS) $(CPPFLAGS) -Wa,-g -c $< -o $@
+install:
+	@mkdir -p $(INSTALLROOT)$(SHAREDIR)/pkgconfig/$(ARCH)-efi-gnu/
+	@mkdir -p $(INSTALLROOT)$(SHAREDIR)/pkgconfig/personality.d/
+	@$(INSTALL) -v -m 644 gnu-efi-$(ARCH).pc $(INSTALLROOT)$(SHAREDIR)/pkgconfig/$(ARCH)-efi-gnu/gnu-efi.pc
+	@$(INSTALL) -v -m 644 $(foreach arch,$(ARCH) $(ARCH_ALIASES),$(arch)-efi-gnu.personality) \
+		$(INSTALLROOT)$(SHAREDIR)/pkgconfig/personality.d/
 
-%.s: %.S
-	$(CC) $(INCDIR) $(CFLAGS) $(CPPFLAGS) -E $< -o $@
+.PHONY: install install_compat
 
-define SEDATAT
-	$(SED) \
-		-e "s,@@BFD_ARCH@@,${BFD_ARCH},g" \
-		-e "s,@@EFI_ARCH@@,${ARCH},g" \
-		-e "s,@@INCLUDEDIR@@,${INCLUDEDIR},g" \
-		-e "s,@@LIBDIR@@,${LIBDIR},g" \
-		-e "s,@@CFLAGS@@,${EXPORT_CFLAGS},g" \
-		-e "s,@@LDFLAGS@@,${EXPORT_LDFLAGS},g" \
-		-e "s,@@PREFIX@@,${PREFIX},g" \
-		-e "s,@@SHAREDIR@@,${SHAREDIR},g" \
-		-e "s,@@VERSION@@,${VERSION},g"
-endef
-
-gnu-efi-%.pc : gnu-efi.pc.in
-	$(SEDATAT) $< > $@
-
-$(foreach arch,$(ARCHES) $(ALL_ARCH_ALIASES),$(arch)-efi-gnu.personality) :: %-efi-gnu.personality : template.personality.in
-	$(SEDATAT) -e "s,@@TRIPLET_ARCH@@,$*,g" $< > $@
+include $(SRCDIR)/../Make.rules

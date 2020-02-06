@@ -42,10 +42,17 @@ VPATH = $(SRCDIR)
 include $(SRCDIR)/Make.version
 include $(SRCDIR)/Make.defaults
 
-SUBDIRS = lib gnuefi inc apps
+SUBDIRS = lib gnuefi inc apps pkgconf
 gnuefi: lib
 
 all:	check_gcc $(SUBDIRS)
+
+pkgconf_build_all:
+	@set -e ; \
+	for arch in $(ARCHES) ; do \
+		make CC="echo 5.0" OBJDIR=$(OBJDIR) ARCH=$${arch} \
+			pkgconf ; \
+	done
 
 mkvars:
 	@echo AR=$(AR)
@@ -90,6 +97,18 @@ install install_compat:
 	@set -e ; for d in $(SUBDIRS); do \
 		mkdir -p $(OBJDIR)/$$d; \
 		$(MAKE) -C $(OBJDIR)/$$d -f $(SRCDIR)/$$d/Makefile SRCDIR=$(SRCDIR)/$$d $@ ; done
+
+pkgconf_install_all:
+	@set -e ; \
+	for d in pkgconf; do \
+		mkdir -p $(OBJDIR)/$$d; \
+		for arch in $(ARCHES) ; do \
+			$(MAKE) -C $(OBJDIR)/$$d -f $(SRCDIR)/$$d/Makefile \
+				OBJDIR=$(OBJDIR) SRCDIR=$(SRCDIR)/$$d \
+				CC="echo 5.0" ARCH=$${arch} \
+				install ; \
+		done ; \
+	done
 
 .PHONY:	$(SUBDIRS) clean depend
 

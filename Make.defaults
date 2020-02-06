@@ -37,6 +37,7 @@
 TOPDIR ?= $(shell if [ "$$PWD" != "" ]; then echo $$PWD; else pwd; fi)
 
 ARCHES=aa64 arm ia32 ia64 mips64el x64
+ALL_ARCH_ALIASES=aarch64 armv6 armv7 i386 i686 x86_64 amd64
 
 #
 # Variables below overridable from command-line:
@@ -61,8 +62,10 @@ is_absolute = $(subst $(call stripped,$(1)),$(empty),$(call unstripped,$(1)))
 override INSTALLROOT:=$(if $(call is_absolute,$(INSTALLROOT)),,$(TOPDIR)/)$(INSTALLROOT)
 
 PREFIX       := /usr/local
-LIBDIR 	     := $(PREFIX)/lib
-INSTALL	     := install
+INCLUDEDIR   := $(PREFIX)/include
+LIBDIR       := $(PREFIX)/lib
+SHAREDIR     := $(PREFIX)/share
+SYSCONFDIR   := /etc
 
 # Compilation tools
 HOSTCC       := $(prefix)gcc
@@ -72,7 +75,9 @@ LD           := $(prefix)$(CROSS_COMPILE)ld
 AR           := $(prefix)$(CROSS_COMPILE)ar
 RANLIB       := $(prefix)$(CROSS_COMPILE)ranlib
 OBJCOPY      := $(prefix)$(CROSS_COMPILE)objcopy
+INSTALL      := install
 SYMLINK      := ln -vfs
+SED          := sed
 
 
 # Host/target identification
@@ -111,7 +116,7 @@ endif
 #
 # Where to build the package
 #
-OBJDIR       := $(TOPDIR)/$(ARCH)
+OBJDIR       ?= $(TOPDIR)/$(ARCH)
 
 #
 # Variables below derived from variables above
@@ -127,6 +132,7 @@ EXPORT_LDFLAGS ?=
 
 ifeq ($(ARCH),ia64)
   EXPORT_CFLAGS += -mfixed-range=f32-f127
+  ARCH_ALIASES =
 endif
 
 ifeq ($(ARCH),ia32)
@@ -134,6 +140,7 @@ ifeq ($(ARCH),ia32)
   ifeq ($(HOSTARCH),x64)
     ARCH3264 = -m32
   endif
+  ARCH_ALIASES = i386 i686
 endif
 
 ifeq ($(ARCH),x64)
@@ -156,6 +163,7 @@ ifeq ($(ARCH),x64)
   ifeq ($(HOSTARCH),ia32)
     ARCH3264 = -m64
   endif
+  ARCH_ALIASES = x86_64 amd64
 endif
 
 ifneq (,$(filter $(ARCH),ia32 x64))
@@ -170,9 +178,15 @@ ifeq ($(ARCH),mips64el)
   EXPORT_CFLAGS += -march=mips64r2 -EL
   EXPORT_LDFLAGS += -EL
   ARCH3264 = -mabi=64
+  ARCH_ALIASES =
+endif
+
+ifeq ($(ARCH),aa64)
+  ARCH_ALIASES = aarch64
 endif
 
 ifeq ($(ARCH),arm)
+  ARCH_ALIASES = armv6 armv7
   EXPORT_CFLAGS += -marm
 endif
 
