@@ -34,13 +34,12 @@
 #    SUCH DAMAGE.
 #
 
-VERSION = 3.0.11
-
 MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 SRCDIR = $(dir $(MKFILE_PATH))
 
 VPATH = $(SRCDIR)
 
+include $(SRCDIR)/Make.version
 include $(SRCDIR)/Make.defaults
 
 SUBDIRS = lib gnuefi inc apps
