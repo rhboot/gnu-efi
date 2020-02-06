@@ -122,12 +122,15 @@ CPPFLAGS += -DCONFIG_$(ARCH)
 
 CFLAGS += -Wno-error=pragmas
 
+EXPORT_CFLAGS ?=
+EXPORT_LDFLAGS ?=
+
 ifeq ($(ARCH),ia64)
-  CFLAGS += -mfixed-range=f32-f127
+  EXPORT_CFLAGS += -mfixed-range=f32-f127
 endif
 
 ifeq ($(ARCH),ia32)
-  CFLAGS += -mno-mmx -mno-sse
+  EXPORT_CFLAGS += -mno-mmx -mno-sse
   ifeq ($(HOSTARCH),x64)
     ARCH3264 = -m32
   endif
@@ -149,7 +152,7 @@ ifeq ($(ARCH),x64)
     CPPFLAGS += -DGNU_EFI_USE_MS_ABI --std=c11
   endif
 
-  CFLAGS += -mno-red-zone
+  EXPORT_CFLAGS += -mno-red-zone
   ifeq ($(HOSTARCH),ia32)
     ARCH3264 = -m64
   endif
@@ -159,14 +162,18 @@ ifneq (,$(filter $(ARCH),ia32 x64))
   # Disable AVX, if the compiler supports that.
   CC_CAN_DISABLE_AVX=$(shell $(CC) -Werror -c -o /dev/null -xc -mno-avx - </dev/null >/dev/null 2>&1 && echo 1)
   ifeq ($(CC_CAN_DISABLE_AVX), 1)
-    CFLAGS += -mno-avx
+    EXPORT_CFLAGS += -mno-avx
   endif
 endif
 
 ifeq ($(ARCH),mips64el)
-  CFLAGS += -march=mips64r2 -EL
-  LDFLAGS += -EL
+  EXPORT_CFLAGS += -march=mips64r2 -EL
+  EXPORT_LDFLAGS += -EL
   ARCH3264 = -mabi=64
+endif
+
+ifeq ($(ARCH),arm)
+  EXPORT_CFLAGS += -marm
 endif
 
 #
@@ -181,10 +188,6 @@ endif
 endif
 endif
 
-ifeq ($(ARCH),arm)
-CFLAGS += -marm
-endif
-
 # Generic compilation flags
 INCDIR  += -I$(SRCDIR) -I$(TOPDIR)/inc -I$(TOPDIR)/inc/$(ARCH) \
            -I$(TOPDIR)/inc/protocol
@@ -192,23 +195,21 @@ INCDIR  += -I$(SRCDIR) -I$(TOPDIR)/inc -I$(TOPDIR)/inc/$(ARCH) \
 # Only enable -fPIE for non MinGW compilers (unneeded on MinGW)
 GCCMACHINE := $(shell $(CC) -dumpmachine)
 ifneq (mingw32,$(findstring mingw32, $(GCCMACHINE)))
-  CFLAGS += -fPIE
+  EXPORT_CFLAGS += -fPIE
 endif
 
 IS_FREEBSD = $(findstring FreeBSD, $(OS))
 IS_DARWIN = $(findstring Darwin, $(OS))
 
-ifneq "$(or $(IS_FREEBSD), $(IS_DARWIN))" ""
-CFLAGS  += $(ARCH3264) -g -O2 -Wall -Wextra -Werror \
-           -fshort-wchar -fno-strict-aliasing \
-           -ffreestanding -fno-stack-protector
-else
-CFLAGS  += $(ARCH3264) -g -O2 -Wall -Wextra -Wno-pointer-sign -Werror \
-           -fshort-wchar -fno-strict-aliasing \
-	   -ffreestanding -fno-stack-protector -fno-stack-check \
-           -fno-stack-check \
-           $(if $(findstring gcc,$(CC)),-fno-merge-all-constants,)
+EXPORT_CFLAGS += -fshort-wchar -fno-strict-aliasing -fno-stack-protector \
+		 -nostartfiles -nodefaultlibs -nolibc -static-libgcc
+ifeq "$(or $(IS_FREEBSD), $(IS_DARWIN))" ""
+	EXPORT_CFLAGS += -fno-stack-check $(if $(findstring gcc,$(CC)),-fno-merge-all-constants,)
 endif
+EXPORT_CFLAGS += $(ARCH3264)
+CFLAGS += -g3 -O2 -Wall -Wextra -Wno-pointer-sign -Werror $(EXPORT_CFLAGS)
+override CFLAGS := $(CFLAGS)
+EXPORT_CFLAGS += $(CPPFLAGS)
 
 ifeq "$(IS_DARWIN)" ""
 ARFLAGS += -U
@@ -217,8 +218,9 @@ ARFLAGS := rDv
 endif
 
 ASFLAGS += $(ARCH3264)
-LDFLAGS	+= -nostdlib --warn-common --no-undefined --fatal-warnings \
-	   --build-id=sha1
+EXPORT_LDFLAGS += -nostdlib --warn-common --no-undefined --fatal-warnings \
+		  --build-id=sha1
+LDFLAGS += $(EXPORT_LDFLAGS)
 
 ifneq ($(ARCH),arm)
 export LIBGCC=$(shell $(CC) $(CFLAGS) $(ARCH3264) -print-libgcc-file-name)
