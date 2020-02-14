@@ -58,7 +58,7 @@
 	$(CC) $(INCDIR) $(CFLAGS) $(CPPFLAGS) -E $< -o $@
 
 %.o: %.S
-	$(CC) $(INCDIR) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(CC) $(INCDIR) $(CFLAGS) $(CPPFLAGS) -Wa,-g -c $< -o $@
 
 %.s: %.S
 	$(CC) $(INCDIR) $(CFLAGS) $(CPPFLAGS) -E $< -o $@
