@@ -3,26 +3,45 @@ OUTPUT_ARCH(aarch64)
 ENTRY(_start)
 SECTIONS
 {
-  .text 0x0 : {
+  . = 0;
+  ImageBase = .;
+  .hash : { *(.hash) }
+  .gnu.hash : { *(.gnu.hash) }
+  .eh_frame : { *(.eh_frame) }
+
+  .text : ALIGN(4096)
+  {
+    _start = .;
     _text = .;
-    *(.text.head)
     *(.text)
     *(.text.*)
     *(.gnu.linkonce.t.*)
-    *(.srodata)
+    *(.srodata*)
     *(.rodata*)
-    . = ALIGN(16);
+    . = ALIGN(4096);
   }
   _etext = .;
   _text_size = . - _text;
-  .dynamic  : { *(.dynamic) }
+
+  /*
+   * We have to have a some kind of relocations, or else the loader doesn't
+   * believe this is position independent, and will try to load us at e.g.
+   * 0x1000, which will fail.
+   */
+  /*
+  . = ALIGN(4096);
+  .reloc :
+  {
+   *(.reloc)
+  }
+  */
+
+  .dynamic : { *(.dynamic) }
   .data : ALIGN(4096)
   {
    _data = .;
+   *(.data*)
    *(.sdata)
-   *(.data)
-   *(.data1)
-   *(.data.*)
    *(.got.plt)
    *(.got)
 
@@ -48,36 +67,32 @@ SECTIONS
 
    /* the EFI loader doesn't seem to like a .bss section, so we stick
       it all into .data: */
-   . = ALIGN(16);
+   . = ALIGN(4096);
    _bss = .;
    *(.sbss)
    *(.scommon)
    *(.dynbss)
    *(.bss)
    *(COMMON)
-   . = ALIGN(16);
-
+   *(.rel.local)
+   . = ALIGN(4096);
    _bss_end = .;
   }
+  .note.gnu.build-id : { *(.note.gnu.build-id) }
 
   .rela.dyn : { *(.rela.dyn) }
-  .rela.plt : { *(.rela.plt) }
   .rela.got : { *(.rela.got) }
   .rela.data : { *(.rela.data) *(.rela.data*) }
-  . = ALIGN(512);
   _edata = .;
   _data_size = . - _data;
 
   . = ALIGN(4096);
-  .dynsym   : { *(.dynsym) }
+  .dynsym : ALIGN(4096) { *(.dynsym) }
   . = ALIGN(4096);
-  .dynstr   : { *(.dynstr) }
+  .dynstr : ALIGN(4096) { *(.dynstr) }
   . = ALIGN(4096);
-  .note.gnu.build-id : { *(.note.gnu.build-id) }
-  /DISCARD/ :
+  .ignored.reloc :
   {
-    *(.rel.reloc)
-    *(.eh_frame)
     *(.note.GNU-stack)
   }
   .comment 0 : { *(.comment) }

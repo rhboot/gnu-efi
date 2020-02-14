@@ -194,11 +194,9 @@ endif
 # Set HAVE_EFI_OBJCOPY if objcopy understands --target efi-[app|bsdrv|rtdrv],
 # otherwise we need to compose the PE/COFF header using the assembler
 #
-ifneq ($(ARCH),aa64)
 ifneq ($(ARCH),arm)
 ifneq ($(ARCH),mips64el)
 export HAVE_EFI_OBJCOPY=y
-endif
 endif
 endif
 
@@ -221,8 +219,8 @@ ifeq "$(or $(IS_FREEBSD), $(IS_DARWIN))" ""
 	EXPORT_CFLAGS += -fno-stack-check $(if $(findstring gcc,$(CC)),-fno-merge-all-constants,)
 endif
 EXPORT_CFLAGS += $(ARCH3264)
-CFLAGS += -g3 -O2 -Wall -Wextra -Wno-pointer-sign -Werror $(EXPORT_CFLAGS)
-override CFLAGS := $(CFLAGS)
+CFLAGS += -g3 -Og -Wall -Wextra -Wno-pointer-sign -Werror $(EXPORT_CFLAGS)
+override CFLAGS := $(CFLAGS) -grecord-gcc-switches -frecord-gcc-switches
 EXPORT_CFLAGS += $(CPPFLAGS)
 
 ifeq "$(IS_DARWIN)" ""
