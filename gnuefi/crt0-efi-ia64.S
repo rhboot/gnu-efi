@@ -32,7 +32,12 @@
     THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
     SUCH DAMAGE.
 */
+#include <dwarf.h>
+
+	.loc_mark_labels 1
+
 	.text
+.Ltext:
 	.psr abi64
 	.psr lsb
 	.lsb
@@ -50,7 +55,7 @@ _start:
 	br.call.sptk.few rp=_relocate
 .Lret0:	
 	cmp.ne p6,p0=r0,r8		// r8 == EFI_SUCCESS?
-(p6)	br.cond.sptk.few .exit		// no ->
+(p6)	br.cond.sptk.few .Lexit		// no ->
 
 .Lret1:
 
@@ -58,14 +63,15 @@ _start:
 	mov out1=in1			// systab
 	br.call.sptk.few rp=_entry
 .Lret2:
-.exit:
+.Lexit:
 	mov ar.pfs=loc0
 	mov rp=loc1
 	;;
 	br.ret.sptk.few rp
 
 	.endp _start
-
+	.size _start, .-_start
+.Letext:
 
 	// PE32+ wants a PLABEL, not the code address of the entry point:
 
@@ -76,6 +82,11 @@ _start_plabel:
 	data8	_start
 	data8	__gp
 
+	/*
+	 * We have to have a some kind of relocations, or else the loader
+	 * doesn't believe this is position independent, and will try to load
+	 * us at e.g.  0x1000, which will fail.
+	 */
 	// hand-craft a .reloc section for the plabel:
 
 #define IMAGE_REL_BASED_DIR64	10
@@ -85,3 +96,17 @@ _start_plabel:
 	data4	12					// Block Size (2*4+2*2)
 	data2	(IMAGE_REL_BASED_DIR64<<12) +  0	// reloc for plabel's entry point
 	data2	(IMAGE_REL_BASED_DIR64<<12) +  8	// reloc for plabel's global pointer
+
+DEBUG_INFO_HEADER(.Ltext, .Letext, _start,
+		  .Ldbg_producer, .Ldbg_dir, .Ldbg_file);
+DEBUG_INFO_FUNCTION(2, 48, _start, .Letext, .Ldbg_start);
+DEBUG_INFO_LABEL(3, 68, .Lexit, .Ldbg_exit);
+DEBUG_INFO_FOOTER();
+DEBUG_ABBREV_HEADER();
+DEBUG_ABBREV_FUNCTION(2);
+DEBUG_ABBREV_LABEL(3);
+DEBUG_INFO_STR(.Ldbg_producer, "gnu-efi");
+DEBUG_INFO_STR(.Ldbg_dir, "./ia64/gnuefi");
+DEBUG_INFO_STR(.Ldbg_file, __FILE__);
+DEBUG_INFO_STR(.Ldbg_start, "_start");
+DEBUG_INFO_STR(.Ldbg_exit, ".Lexit");

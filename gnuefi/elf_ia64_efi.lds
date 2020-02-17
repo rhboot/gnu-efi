@@ -83,6 +83,12 @@ SECTIONS
   }
   _edata = .;
   _data_size = . - _etext;
+
+  /*
+   * We have to have a some kind of relocations, or else the loader doesn't
+   * believe this is position independent, and will try to load us at e.g.
+   * 0x1000, which will fail.
+   */
   . = ALIGN(4096);
   .reloc :		/* This is the PECOFF .reloc section! */
   {
