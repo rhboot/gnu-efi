@@ -40,10 +40,7 @@
 		    -j .reloc $(FORMAT) $*.so $@
 
 %.efi.debug: %.so
-	$(OBJCOPY) -j .debug_info -j .debug_abbrev -j .debug_aranges \
-		-j .debug_line -j .debug_str -j .debug_ranges \
-		-j .note.gnu.build-id \
-		$(FORMAT) $*.so $@
+	$(OBJCOPY) $(FORMAT) $*.so $@
 
 %.so: %.o
 	$(LD) $(LDFLAGS) $^ -o $@ $(LOADLIBES)
