@@ -21,7 +21,7 @@ _init_array:
 	.p2align 3, 0
 	.globl _init_array_end
 _init_array_end:
-	.long 0
+	.8byte 0
 	.section .ctors, "a", ARCH_SECTION(init_array)
 	.p2align 3, 0
 	.globl __CTOR_LIST__
@@ -29,7 +29,7 @@ __CTOR_LIST__:
 	.p2align 3, 0
 	.globl __CTOR_END__
 __CTOR_END__:
-	.long 0
+	.8byte 0
 	.section .dtors, "a", ARCH_SECTION(fini_array)
 	.p2align 3, 0
 	.globl __DTOR_LIST__
@@ -37,7 +37,7 @@ __DTOR_LIST__:
 	.p2align 3, 0
 	.globl __DTOR_END__
 __DTOR_END__:
-	.long 0
+	.8byte 0
 	.section .fini_array, "a", ARCH_SECTION(fini_array)
 	.p2align 3, 0
 	.globl _fini_array
@@ -45,4 +45,4 @@ _fini_array:
 	.p2align 3, 0
 	.globl _fini_array_end
 _fini_array_end:
-	.long 0
+	.8byte 0
