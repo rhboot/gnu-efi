@@ -15,7 +15,8 @@
  * GNU General Public License as published by the Free Software Foundation;
  * either version 2 of the License, or (at your option) any later version.
  */
-
+#include <dwarf.h>
+	.loc_mark_labels 1
 	.section	.text.head
 
 	/*
@@ -122,6 +123,7 @@ section_table:
 	.short	0		// NumberOfLineNumbers  (0 for executables)
 	.long	0xe0500020	// Characteristics (section flags)
 
+.Ltext:
 _start:
 	stmfd		sp!, {r0-r2, lr}
 
@@ -140,6 +142,20 @@ _start:
 
 0:	add		sp, sp, #12
 	ldr		pc, [sp], #4
+.Letext:
+	.size _start, .-_start
 
 .L_DYNAMIC:
 	.word		_DYNAMIC - .
+
+DEBUG_INFO_HEADER(.Ltext, .Letext, _start,
+		  .Ldbg_producer, .Ldbg_dir, .Ldbg_file);
+DEBUG_INFO_FUNCTION(2, 46, _start, .Letext, .Ldbg_start);
+DEBUG_INFO_FOOTER();
+DEBUG_ABBREV_HEADER();
+DEBUG_ABBREV_FUNCTION(2);
+DEBUG_ABBREV_END();
+DEBUG_INFO_STR(.Ldbg_producer, "gnu-efi");
+DEBUG_INFO_STR(.Ldbg_dir, "./arm/gnuefi");
+DEBUG_INFO_STR(.Ldbg_file, __FILE__);
+DEBUG_INFO_STR(.Ldbg_start, "_start");
