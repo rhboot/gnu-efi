@@ -59,11 +59,14 @@ LOADLIBES	+= -T $(LDSCRIPT)
 TARGET_APPS = t.efi t2.efi t3.efi t4.efi t5.efi t6.efi \
 	      printenv.efi t7.efi t8.efi tcc.efi modelist.efi \
 	      route80h.efi drv0_use.efi AllocPages.efi exit.efi \
-	      FreePages.efi setjmp.efi debughook.efi debughook.efi.debug \
+	      FreePages.efi setjmp.efi debughook.efi \
 	      bltgrid.efi lfbgrid.efi setdbg.efi unsetdbg.efi \
 	      ctors_test.efi
+TARGET_APPS_DEBUG = $(patsubst %.efi,%.efi.debug,$(TARGET_APPS))
 TARGET_BSDRIVERS = drv0.efi
+TARGET_BSDRIVERS_DEBUG = $(patsubst %.efi,%.efi.debug,$(TARGET_BSDRIVERS))
 TARGET_RTDRIVERS =
+TARGET_RTDRIVERS_DEBUG = $(patsubst %.efi,%.efi.debug,$(TARGET_RTDRIVERS))
 
 ifneq ($(HAVE_EFI_OBJCOPY),)
 
@@ -82,7 +85,9 @@ LDFLAGS		+= --defsym=EFI_SUBSYSTEM=$(SUBSYSTEM)
 
 endif
 
-TARGETS = $(TARGET_APPS) $(TARGET_BSDRIVERS) $(TARGET_RTDRIVERS)
+TARGETS = $(TARGET_APPS) $(TARGET_APPS_DEBUG) \
+	  $(TARGET_BSDRIVERS) $(TARGET_BSDRIVERS_DEBUG) \
+	  $(TARGET_RTDRIVERS) $(TARGET_RTDRIVERS_DEBUG)
 
 all:	$(TARGETS)
 
@@ -92,5 +97,6 @@ clean:
 	@rm -vf $(TARGETS) *~ *.o *.so
 
 .PHONY: install install_compat
+.SECONDARY: $(patsubst %.efi,%.so,$(TARGET_APPS)) $(TARGET_APPS_DEBUG)
 
 include $(SRCDIR)/../Make.rules
