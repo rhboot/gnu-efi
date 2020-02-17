@@ -16,6 +16,9 @@
  * GNU General Public License as published by the Free Software Foundation;
  * either version 2 of the License, or (at your option) any later version.
  */
+#include <dwarf.h>
+
+	.loc_mark_labels 1
 
 	.section	.text.head
 
@@ -123,6 +126,7 @@ section_table:
 
 	.set		push
 	.set		noreorder
+.Ltext:
 	.align		4
 
 	.globl	_start
@@ -136,14 +140,14 @@ _start:
 	.align		3
 	bal		1f
 	sd		$gp, 8($sp)
-_pc:
+.L_pc:
 	.dword		_gp
 	.dword		_DYNAMIC
 	.dword		_relocate
 1:
 	// pc in ra
 	ld		$gp, ($ra)
-	dli		$t0, _pc
+	dli		$t0, .L_pc
 	dsubu		$gp, $t0
 	daddu		$gp, $ra
 
@@ -155,7 +159,7 @@ _pc:
 	// a3: SystemTable
 	move		$a3, $a1
 	// a0: ImageBase
-	dli		$t1, ImageBase - _pc
+	dli		$t1, ImageBase - .L_pc
 	daddu		$a0, $ra, $t1
 	// a1: DynamicSection
 	ld		$t1, 8($ra)
@@ -184,5 +188,18 @@ _pc:
 	jr		$ra
 	daddiu		$sp, 32
 	.end		_start
+	.size _start, .-_start
+.Letext:
 
 	.set		pop
+
+DEBUG_INFO_HEADER(.Ltext, .Letext, _start,
+		  .Ldbg_producer, .Ldbg_dir, .Ldbg_file);
+DEBUG_INFO_LOCAL(2, 137, _start, .Letext, .Ldbg_start);
+DEBUG_INFO_FOOTER();
+DEBUG_ABBREV_HEADER();
+DEBUG_ABBREV_LOCAL(2);
+DEBUG_INFO_STR(.Ldbg_producer, "gnu-efi");
+DEBUG_INFO_STR(.Ldbg_dir, "./mips64el/gnuefi");
+DEBUG_INFO_STR(.Ldbg_file, __FILE__);
+DEBUG_INFO_STR(.Ldbg_start, "_start");
