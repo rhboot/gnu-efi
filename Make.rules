@@ -49,19 +49,19 @@
 	$(LD) $(LDFLAGS) $^ -o $@ $(LOADLIBES)
 
 %.o: %.c
-	$(CC) $(INCDIR) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(CC) $(INCDIR) $(CFLAGS) $(CPPFLAGS) -c $^ -o $@
 
 %.s: %.c
-	$(CC) $(INCDIR) $(CFLAGS) $(CPPFLAGS) -S $< -o $@
+	$(CC) $(INCDIR) $(CFLAGS) $(CPPFLAGS) -S $^ -o $@
 
 %.i: %.c
-	$(CC) $(INCDIR) $(CFLAGS) $(CPPFLAGS) -E $< -o $@
+	$(CC) $(INCDIR) $(CFLAGS) $(CPPFLAGS) -E $^ -o $@
 
 %.o: %.S
-	$(CC) $(INCDIR) $(CFLAGS) $(CPPFLAGS) -Wa,-g -c $< -o $@
+	$(CC) $(INCDIR) $(CFLAGS) $(CPPFLAGS) -Wa,-g -c $^ -o $@
 
 %.s: %.S
-	$(CC) $(INCDIR) $(CFLAGS) $(CPPFLAGS) -E $< -o $@
+	$(CC) $(INCDIR) $(CFLAGS) $(CPPFLAGS) -E $^ -o $@
 
 define SEDATAT
 	$(SED) \
