@@ -32,8 +32,13 @@
     THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
     SUCH DAMAGE.
 */
+#include <dwarf.h>
+
+	.arch i686
+	.loc_mark_labels 1
 
 	.text
+.Ltext:
 	.align 4
 
 	.globl _start
@@ -57,13 +62,20 @@ _start:
 	popl %ebx
 	popl %ebx
 	testl %eax,%eax
-	jne .exit
+	jne .Lexit
   
 	call _entry			# call app with "image" and "systab" argument
 
-.exit:	leave
+.Lexit:	leave
 	ret
+.Letext:
+	.size _start, .-_start
  
+	/*
+	 * We have to have a some kind of relocations, or else the loader
+	 * doesn't believe this is position independent, and will try to load
+	 * us at e.g.  0x1000, which will fail.
+	 */
 	// hand-craft a dummy .reloc section so EFI knows it's a relocatable executable:
 	.data
 .dummy0:
@@ -71,7 +83,22 @@ _start:
 	.long	0
 
 #define IMAGE_REL_ABSOLUTE	0
-	.section .reloc, "a"
+	.section .reloc, "", @0
 	.long	.dummy1-.dummy0				// Page RVA
 	.long	10					// Block Size (2*4+2)
 	.word	(IMAGE_REL_ABSOLUTE<<12) +  0		// reloc for dummy
+
+DEBUG_INFO_HEADER(.Ltext, .Letext, _start,
+		  .Ldbg_producer, .Ldbg_dir, .Ldbg_file);
+DEBUG_INFO_FUNCTION(2, 46, _start, .Letext, .Ldbg_start);
+DEBUG_INFO_LABEL(3, 72, .Lexit, .Ldbg_Lexit);
+DEBUG_INFO_FOOTER();
+DEBUG_ABBREV_HEADER();
+DEBUG_ABBREV_FUNCTION(2);
+DEBUG_ABBREV_LABEL(3);
+DEBUG_ABBREV_END();
+DEBUG_INFO_STR(.Ldbg_producer, "gnu-efi");
+DEBUG_INFO_STR(.Ldbg_file, __FILE__);
+DEBUG_INFO_STR(.Ldbg_dir, "./ia32/gnuefi");
+DEBUG_INFO_STR(.Ldbg_start, "_start");
+DEBUG_INFO_STR(.Ldbg_Lexit, ".Lexit");
