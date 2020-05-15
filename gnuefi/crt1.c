@@ -70,7 +70,7 @@ _start(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab)
 	print(L"ldbase:"); printval(ldbase);
 	print(L"_DYNAMIC:"); printval(_DYNAMIC);
 	print(L"&_DYNAMIC:"); printval(&_DYNAMIC);
-	dyn = (void *)((unsigned long)&_DYNAMIC + ldbase);
+	dyn = (void *)((unsigned long)&_DYNAMIC + 0);
 	systab->BootServices->Stall(1000);
 	print(L"dyn:"); printval(dyn);
 	systab->BootServices->Stall(1000);
@@ -85,6 +85,8 @@ _start(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab)
 	systab->BootServices->Stall(1000);
 	ctors(ldbase);
 	systab->BootServices->Stall(1000);
+	Print(L"Calling efi_main@0x%016lx(image@0x%016lx, systab@0x%016lx)\n",
+	      efi_main, image, systab);
 	status = efi_main(image, systab);
 	systab->BootServices->Stall(1000);
 	dtors(ldbase);
@@ -117,13 +119,16 @@ static void EFIAPI ctors(UINTN ldbase)
 			func();
 		}
 	}
+	Print(L"out of _init_array\n");
 
 	for (UINTN *location = (UINTN *)&__CTOR_LIST__; location < &__CTOR_END__; location++) {
 		funcp func = *(funcp *)(location + ldbase);
+		Print(L"location:%p *location:%p func:%p\n", location, *location, func);
 		if (func != NULL) {
 			func();
 		}
 	}
+	Print(L"out of __CTOR_LIST__\n");
 }
 
 static void EFIAPI dtors(UINTN ldbase)

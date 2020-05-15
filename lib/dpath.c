@@ -977,7 +977,11 @@ _DevPathFilePath (
     FILEPATH_DEVICE_PATH    *Fp;
 
     Fp = DevPath;
+    Print(L"%a:%d Str:%xh\n", __FILE__, __LINE__, Str);
+    Print(L"%a:%d Fp:%xh\n", __FILE__, __LINE__, Fp);
+    Print(L"%a:%d Fp->PathName:%xh\n", __FILE__, __LINE__, Fp->PathName);
     CatPrint(Str, L"%s", Fp->PathName);
+    Print(L"%a:%d\n", __FILE__, __LINE__);
 }
 
 static VOID
@@ -1136,13 +1140,16 @@ DevicePathToStr (
     VOID                (*DumpNode)(POOL_PRINT *, VOID *);
     UINTN               Index, NewSize;
 
+    Print(L"%a:%d\n", __FILE__, __LINE__);
     ZeroMem(&Str, sizeof(Str));
 
     //
     // Unpacked the device path
     //
 
+    Print(L"%a:%d\n", __FILE__, __LINE__);
     DevPath = UnpackDevicePath(DevPath);
+    Print(L"%a:%d\n", __FILE__, __LINE__);
     ASSERT (DevPath);
 
 
@@ -1151,17 +1158,21 @@ DevicePathToStr (
     //
 
     DevPathNode = DevPath;
+    Print(L"%a:%d\n", __FILE__, __LINE__);
     while (!IsDevicePathEnd(DevPathNode)) {
+    Print(L"%a:%d\n", __FILE__, __LINE__);
         //
         // Find the handler to dump this device path node
         //
 
         DumpNode = NULL;
         for (Index = 0; DevPathTable[Index].Function; Index += 1) {
+    Print(L"%a:%d\n", __FILE__, __LINE__);
 
             if (DevicePathType(DevPathNode) == DevPathTable[Index].Type &&
                 DevicePathSubType(DevPathNode) == DevPathTable[Index].SubType) {
                 DumpNode = DevPathTable[Index].Function;
+    Print(L"%a:%d,idx=%d DumpNode:%xh\n", __FILE__, __LINE__, Index, DumpNode);
                 break;
             }
         }
@@ -1171,6 +1182,7 @@ DevicePathToStr (
         //
 
         if (!DumpNode) {
+    Print(L"%a:%d\n", __FILE__, __LINE__);
             DumpNode = _DevPathNodeUnknown;
         }
 
@@ -1179,6 +1191,7 @@ DevicePathToStr (
         //
 
         if (Str.len  &&  DumpNode != _DevPathEndInstance) {
+    Print(L"%a:%d\n", __FILE__, __LINE__);
             CatPrint (&Str, L"/");
         }
 
@@ -1186,23 +1199,31 @@ DevicePathToStr (
         // Print this node of the device path
         //
 
+    Print(L"%a:%d\n", __FILE__, __LINE__);
         DumpNode (&Str, DevPathNode);
 
         //
         // Next device path node
         //
 
+    Print(L"%a:%d\n", __FILE__, __LINE__);
         DevPathNode = NextDevicePathNode(DevPathNode);
+    Print(L"%a:%d\n", __FILE__, __LINE__);
     }
 
     //
     // Shrink pool used for string allocation
     //
 
+    Print(L"%a:%d\n", __FILE__, __LINE__);
     FreePool (DevPath);
+    Print(L"%a:%d\n", __FILE__, __LINE__);
     NewSize = (Str.len + 1) * sizeof(CHAR16);
+    Print(L"%a:%d\n", __FILE__, __LINE__);
     Str.str = ReallocatePool (Str.str, NewSize, NewSize);
+    Print(L"%a:%d\n", __FILE__, __LINE__);
     Str.str[Str.len] = 0;
+    Print(L"%a:%d\n", __FILE__, __LINE__);
     return Str.str;
 }
 

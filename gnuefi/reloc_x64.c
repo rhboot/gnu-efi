@@ -111,6 +111,9 @@ EFI_STATUS _relocate (unsigned long ldbase, Elf64_Dyn *dyn,
 	unsigned long *addr;
 	int i;
 
+	print(L"ldbase:"); printval(ldbase);
+	print(L"dyn:"); printval(dyn);
+	print(L"\n");
 	for (i = 0; dyn[i].d_tag != DT_NULL; ++i) {
 		print(L"i:"); printval(i);
 		print(L"dyn[i].d_tag:"); printval(dyn[i].d_tag);
