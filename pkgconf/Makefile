@@ -53,9 +53,6 @@ clean:
 install:
 	@mkdir -p $(INSTALLROOT)$(SHAREDIR)/pkgconfig/$(ARCH)-efi-gnu/
 	@mkdir -p $(INSTALLROOT)$(SHAREDIR)/pkgconfig/personality.d/
-	@$(INSTALL) -v -m 644 gnu-efi-$(ARCH).pc $(INSTALLROOT)$(SHAREDIR)/pkgconfig/$(ARCH)-efi-gnu/gnu-efi.pc
-	@$(INSTALL) -v -m 644 $(foreach arch,$(ARCH) $(ARCH_ALIASES),$(arch)-efi-gnu.personality) \
-		$(INSTALLROOT)$(SHAREDIR)/pkgconfig/personality.d/
 
 .PHONY: install install_compat
 
