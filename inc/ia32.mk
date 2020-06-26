@@ -17,7 +17,7 @@ EFI_ARCH_CFLAGS := -mno-mmx -mno-sse \
 		   $(EFI_ARCH_CAN_DISABLE_AVX) \
 		   $(EFI_ARCH_CLANG_BUGS) \
 		   -DPAGE_SIZE=4096 -DPAGE_SHIFT=12
-EFI_ARCH_LDFLAGS :=
+EFI_ARCH_LDFLAGS := --no-ld-generated-unwind-info
 EFI_ARCH_FORMAT := --target efi-app-$(EFI_BFDARCH)
 EFI_ARCH_SUFFIX := ia32
 EFI_ARCH_SUFFIX_UPPER := IA32

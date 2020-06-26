@@ -44,6 +44,7 @@ include efi/$(EFI_ARCH).mk
 GNUEFI_LIB_PATHS := $(sort @@LIBEFIDIR@@ @@GNUEFIDIR@@)
 GNUEFI_LDFLAGS := -nostdlib --warn-common --no-undefined --fatal-warnings \
 		  --build-id=sha1 -shared -Bsymbolic --exclude-libs ALL \
+		  --no-eh-frame-hdr --orphan-handling=error \
 		  $(foreach x,$(GNUEFI_LIB_PATHS),-L$(x)) @@GNUEFIDIR@@/crt0.o
 
 ifeq ($(origin EFI_CC_INCLUDES),undefined)

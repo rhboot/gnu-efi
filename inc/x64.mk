@@ -18,7 +18,7 @@ EFI_ARCH_CFLAGS := -mno-mmx -mno-sse -mno-red-zone \
 		   $(EFI_ARCH_CLANG_BUGS) \
 		   -DEFI_FUNCTION_WRAPPER -DGNU_EFI_USE_MS_ABI \
 		   -DPAGE_SIZE=4096 -DPAGE_SHIFT=12
-EFI_ARCH_LDFLAGS :=
+EFI_ARCH_LDFLAGS := --no-ld-generated-unwind-info
 EFI_ARCH_FORMAT := --target efi-app-$(EFI_BFDARCH)
 EFI_ARCH_SUFFIX := x64
 EFI_ARCH_SUFFIX_UPPER := X64

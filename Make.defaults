@@ -137,6 +137,7 @@ endif
 
 ifeq ($(ARCH),ia32)
   EXPORT_CFLAGS += -mno-mmx -mno-sse
+  EXPORT_LDFLAGS += --no-ld-generated-unwind-info
   ifeq ($(HOSTARCH),x64)
     ARCH3264 = -m32
   endif
@@ -160,6 +161,7 @@ ifeq ($(ARCH),x64)
   endif
 
   EXPORT_CFLAGS += -mno-red-zone
+  EXPORT_LDFLAGS += --no-ld-generated-unwind-info
   ifeq ($(HOSTARCH),ia32)
     ARCH3264 = -m64
   endif
@@ -231,7 +233,8 @@ endif
 
 ASFLAGS += $(ARCH3264)
 EXPORT_LDFLAGS += -nostdlib --warn-common --no-undefined --fatal-warnings \
-		  --build-id=sha1
+		  --build-id=sha1 --no-eh-frame-hdr \
+		  --orphan-handling=error
 LDFLAGS += $(EXPORT_LDFLAGS)
 
 ifneq ($(ARCH),arm)
