@@ -28,15 +28,10 @@ SECTIONS
    * believe this is position independent, and will try to load us at e.g.
    * 0x1000, which will fail.
    */
-  /*
   . = ALIGN(4096);
-  .reloc :
-  {
-   *(.reloc)
-  }
-  */
+  .reloc : { *(.reloc) }
 
-  .dynamic : { *(.dynamic) }
+  .dynamic : ALIGN(512) { *(.dynamic) }
   .data : ALIGN(4096)
   {
    _data = .;
@@ -82,7 +77,11 @@ SECTIONS
 
   .rela.dyn : { *(.rela.dyn) }
   .rela.got : { *(.rela.got) }
-  .rela.data : { *(.rela.data) *(.rela.data*) }
+  .rela.data : ALIGN(512) { *(.rela.data) *(.rela.data*) }
+  .rela.plt : { *(.rela.plt) *(.plt) }
+  .rela.ifunc : { *(.rela.ifunc) }
+  .rela.init_array : { *(.rela.init_array) }
+  .rela.fini_array : { *(.rela.fini_array) }
   _edata = .;
   _data_size = . - _data;
 
@@ -90,10 +89,24 @@ SECTIONS
   .dynsym : ALIGN(4096) { *(.dynsym) }
   . = ALIGN(4096);
   .dynstr : ALIGN(4096) { *(.dynstr) }
+
   . = ALIGN(4096);
+  .debug_info 0 : { *(.debug_info) }
+  .debug_abbrev 0 : { *(.debug_abbrev) }
+  .debug_loc 0 : { *(.debug_loc) }
+  .debug_aranges 0 : { *(.debug_aranges) }
+  .debug_macro 0 : { *(.debug_macro) }
+  .debug_line 0 : { *(.debug_line) }
+  .debug_str 0 : { *(.debug_str) }
+  .debug_ranges 0 : { *(.debug_ranges) }
+
   .ignored.reloc :
   {
     *(.note.GNU-stack)
+    *(.GCC.command.line)
+    *(.gnu.version_d)
+    *(.gnu.version_r)
+    *(.gnu.version)
   }
   .comment 0 : { *(.comment) }
 }

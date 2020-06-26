@@ -6,40 +6,40 @@ SECTIONS
 {
   . = 0;
   ImageBase = .;
-  /* .hash and/or .gnu.hash MUST come first! */
-  .hash : { *(.hash) }
-  .gnu.hash : { *(.gnu.hash) }
-  . = ALIGN(4096);
-  .eh_frame : 
-  { 
-    *(.eh_frame)
-  }
-  . = ALIGN(4096);
-  .text :
+
+  .text 0x2000 : ALIGN(4096)
   {
-   _text = .;
-   *(.text)
-   *(.text.*)
-   *(.gnu.linkonce.t.*)
-   . = ALIGN(16);
+    _start = .;
+    _text = .;
+    *(.text)
+    *(.text.*)
+    *(.gnu.linkonce.t.*)
+    *(.srodata*)
+    *(.rodata*)
+    . = ALIGN(4096);
   }
   _etext = .;
   _text_size = . - _text;
+
+  /*
+   * We have to have a some kind of relocations, or else the loader doesn't
+   * believe this is position independent, and will try to load us at e.g.
+   * 0x1000, which will fail.
+   */
   . = ALIGN(4096);
   .reloc :
   {
    *(.reloc)
   }
 
-  . = ALIGN(4096);
-  .data :
+  .data : ALIGN(4096)
   {
    _data = .;
-   *(.rodata*)
-   *(.got.plt)
-   *(.got)
    *(.data*)
    *(.sdata)
+   *(.got.plt)
+   *(.got)
+   *(.plt.got)
 
    /*
     * Note that these aren't the using the GNU "CONSTRUCTOR" output section
@@ -63,36 +63,79 @@ SECTIONS
 
    /* the EFI loader doesn't seem to like a .bss section, so we stick
       it all into .data: */
+   . = ALIGN(4096);
+   _bss = .;
    *(.sbss)
    *(.scommon)
    *(.dynbss)
    *(.bss)
    *(COMMON)
    *(.rel.local)
+   . = ALIGN(4096);
+   _bss_end = .;
   }
   .note.gnu.build-id : { *(.note.gnu.build-id) }
 
-  _edata = .;
-  _data_size = . - _etext;
-  . = ALIGN(4096);
-  .dynamic  : { *(.dynamic) }
-  . = ALIGN(4096);
-  .rela :
-  {
-    *(.rela.data*)
-    *(.rela.got)
-    *(.rela.stab)
+  .dynamic : ALIGN(512) { *(.dynamic) }
+
+  .rela : {
+	  *(.rela.dyn)
+	  *(.rela.got)
+	  *(.rela.data)
+	  *(.rela.data*)
+	  *(.rela.plt)
+	  *(.rela.text)
+	  *(.rela.ifunc)
+	  *(.rela.init_array)
+	  *(.rela.fini_array)
+	  *(.plt)
   }
+  _edata = .;
+  _data_size = . - _data;
+
   . = ALIGN(4096);
-  .dynsym   : { *(.dynsym) }
-  . = ALIGN(4096);
-  .dynstr   : { *(.dynstr) }
-  . = ALIGN(4096);
-  .ignored.reloc :
+  .hash : ALIGN(1) { *(.hash) }
+  .gnu.hash : ALIGN(1) { *(.gnu.hash) }
+  .dynsym : ALIGN(4096) { *(.dynsym) }
+  .dynstr : ALIGN(4096) { *(.dynstr) }
+  .eh_frame_hdr : ALIGN(1) { *(.eh_frame_hdr) }
+  .eh_frame : ALIGN(1) { *(.eh_frame) }
+
+  /* DWARF debug sections.
+     Symbols in the DWARF debugging sections are relative to the beginning
+     of the section so we begin them at 0.  */
+  /* DWARF 1 */
+  .debug          0 : { *(.debug) }
+  .line           0 : { *(.line) }
+  /* GNU DWARF 1 extensions */
+  .debug_srcinfo  0 : { *(.debug_srcinfo) }
+  .debug_sfnames  0 : { *(.debug_sfnames) }
+  /* DWARF 1.1 and DWARF 2 */
+  .debug_aranges  0 : { *(.debug_aranges) }
+  .debug_pubnames 0 : { *(.debug_pubnames) }
+  /* DWARF 2 */
+  .debug_info     0 : { *(.debug_info) }
+  .debug_abbrev   0 : { *(.debug_abbrev) }
+  .debug_line     0 : { *(.debug_line) }
+  .debug_frame    0 : { *(.debug_frame) }
+  .debug_str      0 : { *(.debug_str) }
+  .debug_loc      0 : { *(.debug_loc) }
+  .debug_macinfo  0 : { *(.debug_macinfo) }
+  .debug_macro    0 : { *(.debug_macro*) }
+  .debug_ranges   0 : { *(.debug_ranges) }
+  /* SGI/MIPS DWARF 2 extensions */
+  .debug_weaknames 0 : { *(.debug_weaknames) }
+  .debug_funcnames 0 : { *(.debug_funcnames) }
+  .debug_typenames 0 : { *(.debug_typenames) }
+  .debug_varnames  0 : { *(.debug_varnames) }
+
+  /DISCARD/ :
   {
-    *(.rela.reloc)
-    *(.eh_frame)
     *(.note.GNU-stack)
+    *(.GCC.command.line)
+    *(.gnu.version_d)
+    *(.gnu.version_r)
+    *(.gnu.version)
   }
   .comment 0 : { *(.comment) }
 }
