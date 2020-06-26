@@ -12,6 +12,26 @@
 
 #pragma GCC optimize "-O0"
 
+#define EFI_DEBUG
+
+static const wchar_t hex[] = L"0123456789abcdef";
+
+static void
+__attribute__((__unused__))
+printval_(EFI_SYSTEM_TABLE *systab, int size, uint64_t value);
+
+static void
+__attribute__((__unused__))
+print_(EFI_SYSTEM_TABLE *systab, wchar_t *str);
+
+#ifdef EFI_DEBUG
+#define printval(a) printval_(systab, sizeof(a), (uint64_t)(a))
+#define print(x) print_(systab, (x))
+#else
+#define printval(a)
+#define print(x)
+#endif
+
 #if __SIZEOF_POINTER__ == 8
 #define Elf_Dyn Elf64_Dyn
 #else
@@ -35,21 +55,40 @@ _start(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab)
 	Elf_Dyn *dyn;
 	EFI_GUID loaded_image_protocol = EFI_LOADED_IMAGE_PROTOCOL_GUID;
 
+	print(L"image:"); printval(image);
+	print(L"systab:"); printval(systab);
+	print(L"systab->BootServices:"); printval(systab->BootServices);
+	print(L"systab->BootServices->HandleProtocol:"); printval(systab->BootServices->HandleProtocol);
+
 	systab->BootServices->HandleProtocol(image, &loaded_image_protocol,
 					     (void *)&loaded_image);
 
+	print(L"loaded_image:"); printval(loaded_image);
+	print(L"loaded_image->ImageBase:"); printval(loaded_image->ImageBase);
 	ldbase = (unsigned long)loaded_image->ImageBase;
 
+	print(L"ldbase:"); printval(ldbase);
+	print(L"_DYNAMIC:"); printval(_DYNAMIC);
+	print(L"&_DYNAMIC:"); printval(&_DYNAMIC);
 	dyn = (void *)((unsigned long)&_DYNAMIC + ldbase);
+	systab->BootServices->Stall(1000);
+	print(L"dyn:"); printval(dyn);
+	systab->BootServices->Stall(1000);
 
 	status = _relocate(ldbase, dyn, image, systab);
+	systab->BootServices->Stall(1000);
 	if (EFI_ERROR(status))
 		return status;
 
+	systab->BootServices->Stall(1000);
 	InitializeLib(image, systab);
+	systab->BootServices->Stall(1000);
 	ctors();
+	systab->BootServices->Stall(1000);
 	status = efi_main(image, systab);
+	systab->BootServices->Stall(1000);
 	dtors();
+	systab->BootServices->Stall(1000);
 
 	return status;
 }
@@ -69,8 +108,11 @@ typedef void (*funcp)(void);
 
 static void ctors(void)
 {
+	Print(L"_init_array:%p &_init_array:%p\n", _init_array, &_init_array);
+	Print(L"_init_array_end:%p &_init_array_end:%p\n", _init_array_end, &_init_array_end);
 	for (funcp *location = (void *)&_init_array; location < (funcp *)&_init_array_end; location++) {
 		funcp func = *location;
+		Print(L"location:%p *location:%p func:%p\n", location, *location, func);
 		if (func != NULL) {
 			func();
 		}
@@ -119,5 +161,54 @@ struct
 };
 
 struct reloc __attribute__((__section__(".reloc"))) dotreloc = {0, 10, 0};
+
+static void
+__attribute__((__unused__))
+printval_(EFI_SYSTEM_TABLE *systab, int size, uint64_t value)
+{
+	wchar_t buf[21] = L"0x0000000000000000\r\n";
+	int shift;
+	uint64_t mask;
+	int i;
+
+	switch(size) {
+	case 1:
+		shift = 4;
+		break;
+	case 2:
+		shift = 12;
+		break;
+	case 4:
+		shift = 28;
+		break;
+	case 8:
+	default:
+		shift = 60;
+		break;
+	}
+	mask = 0xfull << shift;
+
+	for (i = 2; mask != 0; i += 2) {
+		buf[i] = hex[(value & mask) >> shift];
+		mask >>= 4;
+		shift -= 4;
+		buf[i+1] = hex[(value & mask) >> shift];
+		mask >>= 4;
+		shift -= 4;
+	}
+	buf[i+0] = L'\r';
+	buf[i+1] = L'\n';
+	buf[i+2] = L'\0';
+
+	systab->ConOut->OutputString(systab->ConOut, buf);
+}
+
+static void
+__attribute__((__unused__))
+print_(EFI_SYSTEM_TABLE *systab, wchar_t *str)
+{
+	systab->ConOut->OutputString(systab->ConOut, str);
+}
+
 
 // vim:fenc=utf-8:tw=75:noet

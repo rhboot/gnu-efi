@@ -38,7 +38,69 @@
 #include <efi.h>
 #include <efilib.h>
 
+#include <stddef.h>
+
 #include <elf.h>
+
+#define EFI_DEBUG
+
+static const wchar_t hex[] = L"0123456789abcdef";
+
+static void
+__attribute__((__unused__))
+printval_(EFI_SYSTEM_TABLE *systab, int size, uint64_t value)
+{
+	wchar_t buf[21] = L"0x0000000000000000\r\n";
+	int shift;
+	uint64_t mask;
+	int i;
+
+	switch(size) {
+	case 1:
+		shift = 4;
+		break;
+	case 2:
+		shift = 12;
+		break;
+	case 4:
+		shift = 28;
+		break;
+	case 8:
+	default:
+		shift = 60;
+		break;
+	}
+	mask = 0xfull << shift;
+
+	for (i = 2; mask != 0; i += 2) {
+		buf[i] = hex[(value & mask) >> shift];
+		mask >>= 4;
+		shift -= 4;
+		buf[i+1] = hex[(value & mask) >> shift];
+		mask >>= 4;
+		shift -= 4;
+	}
+	buf[i+0] = L'\r';
+	buf[i+1] = L'\n';
+	buf[i+2] = L'\0';
+
+	systab->ConOut->OutputString(systab->ConOut, buf);
+}
+
+static void
+__attribute__((__unused__))
+print_(EFI_SYSTEM_TABLE *systab, wchar_t *str)
+{
+	systab->ConOut->OutputString(systab->ConOut, str);
+}
+
+#ifdef EFI_DEBUG
+#define printval(a) printval_(systab, sizeof(a), (uint64_t)(a))
+#define print(x) print_(systab, (x))
+#else
+#define printval(a)
+#define print(x)
+#endif
 
 EFI_STATUS _relocate (unsigned long ldbase, Elf64_Dyn *dyn,
 		      EFI_HANDLE image EFI_UNUSED,
@@ -50,19 +112,24 @@ EFI_STATUS _relocate (unsigned long ldbase, Elf64_Dyn *dyn,
 	int i;
 
 	for (i = 0; dyn[i].d_tag != DT_NULL; ++i) {
+		print(L"i:"); printval(i);
+		print(L"dyn[i].d_tag:"); printval(dyn[i].d_tag);
 		switch (dyn[i].d_tag) {
 			case DT_RELA:
 				rel = (Elf64_Rel*)
 					((unsigned long)dyn[i].d_un.d_ptr
 					 + ldbase);
+				print(L"rel:   "); printval(rel);
 				break;
 
 			case DT_RELASZ:
 				relsz = dyn[i].d_un.d_val;
+				print(L"relsz: "); printval(relsz);
 				break;
 
 			case DT_RELAENT:
 				relent = dyn[i].d_un.d_val;
+				print(L"relent:"); printval(relent);
 				break;
 
 			default:
@@ -70,11 +137,15 @@ EFI_STATUS _relocate (unsigned long ldbase, Elf64_Dyn *dyn,
 		}
 	}
 
-        if (!rel && relent == 0)
+        if (!rel && relent == 0) {
+		print(L"!rel && relent == 0\r\n");
                 return EFI_SUCCESS;
+	}
 
-	if (!rel || relent == 0)
+	if (!rel || relent == 0) {
+		print(L"!rel || relent == 0\r\n");
 		return EFI_LOAD_ERROR;
+	}
 
 	while (relsz > 0) {
 		/* apply the relocs */
@@ -85,7 +156,10 @@ EFI_STATUS _relocate (unsigned long ldbase, Elf64_Dyn *dyn,
 			case R_X86_64_RELATIVE:
 				addr = (unsigned long *)
 					(ldbase + rel->r_offset);
+				print(L"addr:"); printval(addr);
+				print(L"*addr:"); printval(*addr);
 				*addr += ldbase;
+				print(L"new *addr:"); printval(*addr);
 				break;
 
 			default:
@@ -94,5 +168,6 @@ EFI_STATUS _relocate (unsigned long ldbase, Elf64_Dyn *dyn,
 		rel = (Elf64_Rel*) ((char *) rel + relent);
 		relsz -= relent;
 	}
+	print(L"returning success\r\n");
 	return EFI_SUCCESS;
 }
