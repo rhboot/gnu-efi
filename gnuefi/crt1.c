@@ -40,13 +40,13 @@ print_(EFI_SYSTEM_TABLE *systab, wchar_t *str);
 
 extern unsigned long _DYNAMIC;
 
-static void ctors(void);
-static void dtors(void);
+static void EFIAPI ctors(void);
+static void EFIAPI dtors(void);
 
 extern EFI_STATUS _relocate(unsigned long ldbase, Elf64_Dyn *dyn,
 			    EFI_HANDLE image, EFI_SYSTEM_TABLE *systab);
 
-EFI_STATUS
+EFI_STATUS EFIAPI
 _start(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab)
 {
 	EFI_STATUS status;
@@ -106,7 +106,7 @@ extern UINTN __DTOR_LIST__, __DTOR_END__;
 
 typedef void (*funcp)(void);
 
-static void ctors(void)
+static void EFIAPI ctors(void)
 {
 	Print(L"_init_array:%p &_init_array:%p\n", _init_array, &_init_array);
 	Print(L"_init_array_end:%p &_init_array_end:%p\n", _init_array_end, &_init_array_end);
@@ -126,7 +126,7 @@ static void ctors(void)
 	}
 }
 
-static void dtors(void)
+static void EFIAPI dtors(void)
 {
 	for (funcp *location = (void *)&__DTOR_LIST__; location < (funcp *)&__DTOR_END__; location++) {
 		funcp func = *location;
