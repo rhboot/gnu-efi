@@ -40,8 +40,8 @@ print_(EFI_SYSTEM_TABLE *systab, wchar_t *str);
 
 extern unsigned long _DYNAMIC;
 
-static void EFIAPI ctors(void);
-static void EFIAPI dtors(void);
+static void EFIAPI ctors(UINTN ldbase);
+static void EFIAPI dtors(UINTN ldbase);
 
 extern EFI_STATUS _relocate(unsigned long ldbase, Elf64_Dyn *dyn,
 			    EFI_HANDLE image, EFI_SYSTEM_TABLE *systab);
@@ -83,11 +83,11 @@ _start(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab)
 	systab->BootServices->Stall(1000);
 	InitializeLib(image, systab);
 	systab->BootServices->Stall(1000);
-	ctors();
+	ctors(ldbase);
 	systab->BootServices->Stall(1000);
 	status = efi_main(image, systab);
 	systab->BootServices->Stall(1000);
-	dtors();
+	dtors(ldbase);
 	systab->BootServices->Stall(1000);
 
 	return status;
@@ -106,37 +106,37 @@ extern UINTN __DTOR_LIST__, __DTOR_END__;
 
 typedef void (*funcp)(void);
 
-static void EFIAPI ctors(void)
+static void EFIAPI ctors(UINTN ldbase)
 {
 	Print(L"_init_array:%p &_init_array:%p\n", _init_array, &_init_array);
 	Print(L"_init_array_end:%p &_init_array_end:%p\n", _init_array_end, &_init_array_end);
-	for (funcp *location = (void *)&_init_array; location < (funcp *)&_init_array_end; location++) {
-		funcp func = *location;
+	for (UINTN *location = (UINTN *)&_init_array; location < &_init_array_end; location++) {
+		funcp func = *(funcp *)(location + ldbase);
 		Print(L"location:%p *location:%p func:%p\n", location, *location, func);
 		if (func != NULL) {
 			func();
 		}
 	}
 
-	for (funcp *location = (void *)&__CTOR_LIST__; location < (funcp *)&__CTOR_END__; location++) {
-		funcp func = *location;
+	for (UINTN *location = (UINTN *)&__CTOR_LIST__; location < &__CTOR_END__; location++) {
+		funcp func = *(funcp *)(location + ldbase);
 		if (func != NULL) {
 			func();
 		}
 	}
 }
 
-static void EFIAPI dtors(void)
+static void EFIAPI dtors(UINTN ldbase)
 {
-	for (funcp *location = (void *)&__DTOR_LIST__; location < (funcp *)&__DTOR_END__; location++) {
-		funcp func = *location;
+	for (UINTN *location = (UINTN *)&__DTOR_LIST__; location < &__DTOR_END__; location++) {
+		funcp func = *(funcp *)(location + ldbase);
 		if (func != NULL) {
 			func();
 		}
 	}
 
-	for (funcp *location = (void *)&_fini_array; location < (funcp *)&_fini_array_end; location++) {
-		funcp func = *location;
+	for (UINTN *location = (UINTN *)&_fini_array; location < &_fini_array_end; location++) {
+		funcp func = *(funcp *)(location + ldbase);
 		if (func != NULL) {
 			func();
 		}
