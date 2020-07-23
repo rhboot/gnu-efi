@@ -95,6 +95,7 @@ EFI_GUID NullGuid = { 0,0,0,{0,0,0,0,0,0,0,0} };
 EFI_GUID gEfiDevicePathProtocolGuid                 = EFI_DEVICE_PATH_PROTOCOL_GUID;
 EFI_GUID gEfiDevicePathToTextProtocolGuid           = EFI_DEVICE_PATH_TO_TEXT_PROTOCOL_GUID;
 EFI_GUID gEfiDevicePathFromTextProtocolGuid         = EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL_GUID;
+EFI_GUID gEfiDevicePathUtilitiesProtocolGuid        = EFI_DEVICE_PATH_UTILITIES_PROTOCOL_GUID;
 EFI_GUID gEfiLoadedImageProtocolGuid                = EFI_LOADED_IMAGE_PROTOCOL_GUID;
 EFI_GUID gEfiSimpleTextInProtocolGuid               = EFI_SIMPLE_TEXT_INPUT_PROTOCOL_GUID;
 EFI_GUID gEfiSimpleTextOutProtocolGuid              = EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL_GUID;
