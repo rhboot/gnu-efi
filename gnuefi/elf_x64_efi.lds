@@ -13,9 +13,9 @@ SECTIONS
     _text = .;
     *(.text)
     *(.text.*)
+    *(.plt)
+    *(.plt.got)
     *(.gnu.linkonce.t.*)
-    *(.srodata*)
-    *(.rodata*)
     . = ALIGN(4096);
   }
   _etext = .;
@@ -37,9 +37,10 @@ SECTIONS
    _data = .;
    *(.data*)
    *(.sdata)
+   *(.srodata*)
+   *(.rodata*)
    *(.got.plt)
    *(.got)
-   *(.plt.got)
 
    /*
     * Note that these aren't the using the GNU "CONSTRUCTOR" output section
@@ -78,20 +79,35 @@ SECTIONS
 
   .dynamic : ALIGN(512) { *(.dynamic) }
 
-  .rela : {
-	  *(.rela.dyn)
-	  *(.rela.got)
-	  *(.rela.data)
-	  *(.rela.data*)
-	  *(.rela.plt)
-	  *(.rela.text)
-	  *(.rela.ifunc)
-	  *(.rela.init_array)
-	  *(.rela.fini_array)
-	  *(.plt)
+  .rela :
+  {
+    *(.rela.dyn)
+    *(.rela.got)
+    *(.rela.data)
+    *(.rela.data*)
+    *(.rela.plt)
+    *(.rela.text)
+    *(.rela.ifunc)
+    *(.rela.init_array)
+    *(.rela.fini_array)
+    *(.data.rela.ro.local)
+    *(.data.rela.local)
+    *(.data.rela.ro)
+    *(.data.rel*)
   }
   _edata = .;
   _data_size = . - _data;
+
+  /*
+   * We have to have a some kind of relocations, or else the loader doesn't
+   * believe this is position independent, and will try to load us at e.g.
+   * 0x1000, which will fail.
+   */
+  . = ALIGN(4096);
+  .reloc :
+  {
+   *(.reloc)
+  }
 
   . = ALIGN(4096);
   .hash : ALIGN(1) { *(.hash) }

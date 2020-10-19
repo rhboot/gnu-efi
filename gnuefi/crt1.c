@@ -43,7 +43,7 @@ extern unsigned long _DYNAMIC;
 static void EFIAPI ctors(UINTN ldbase);
 static void EFIAPI dtors(UINTN ldbase);
 
-extern EFI_STATUS _relocate(unsigned long ldbase, Elf64_Dyn *dyn,
+extern EFI_STATUS _relocate(unsigned long ldbase, Elf_Dyn *dyn,
 			    EFI_HANDLE image, EFI_SYSTEM_TABLE *systab);
 
 EFI_STATUS EFIAPI

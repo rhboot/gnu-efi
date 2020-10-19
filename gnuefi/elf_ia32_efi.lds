@@ -14,6 +14,7 @@ SECTIONS
    _text = .;
    *(.text)
    *(.text.*)
+   *(.plt)
    *(.gnu.linkonce.t.*)
    . = ALIGN(16);
   }
@@ -23,8 +24,6 @@ SECTIONS
   .sdata :
   {
    _data = .;
-   *(.got.plt)
-   *(.got)
    *(.srodata)
    *(.sdata)
    *(.sbss)
@@ -40,6 +39,7 @@ SECTIONS
    *(.sdata)
    *(.got.plt)
    *(.got)
+   *(.plt.got)
 
    /*
     * Note that these aren't the using the GNU "CONSTRUCTOR" output section
@@ -80,6 +80,11 @@ SECTIONS
     *(.rel.data.*)
     *(.rel.got)
     *(.rel.stab)
+    *(.rel.plt)
+    *(.rel.text)
+    *(.rel.ifunc)
+    *(.rel.init_array)
+    *(.rel.fini_array)
     *(.data.rel.ro.local)
     *(.data.rel.local)
     *(.data.rel.ro)
@@ -98,16 +103,50 @@ SECTIONS
   {
     *(.reloc)
   }
+
   . = ALIGN(4096);
-  .dynsym   : { *(.dynsym) }
-  . = ALIGN(4096);
-  .dynstr   : { *(.dynstr) }
-  . = ALIGN(4096);
+  .hash : ALIGN(1) { *(.hash) }
+  .gnu.hash : ALIGN(1) { *(.gnu.hash) }
+  .dynsym : ALIGN(4096) { *(.dynsym) }
+  .dynstr : ALIGN(4096) { *(.dynstr) }
+  .eh_frame_hdr : ALIGN(1) { *(.eh_frame_hdr) }
+  .eh_frame : ALIGN(1) { *(.eh_frame) }
+
+  /* DWARF debug sections.
+     Symbols in the DWARF debugging sections are relative to the beginning
+     of the section so we begin them at 0.  */
+  /* DWARF 1 */
+  .debug          0 : { *(.debug) }
+  .line           0 : { *(.line) }
+  /* GNU DWARF 1 extensions */
+  .debug_srcinfo  0 : { *(.debug_srcinfo) }
+  .debug_sfnames  0 : { *(.debug_sfnames) }
+  /* DWARF 1.1 and DWARF 2 */
+  .debug_aranges  0 : { *(.debug_aranges) }
+  .debug_pubnames 0 : { *(.debug_pubnames) }
+  /* DWARF 2 */
+  .debug_info     0 : { *(.debug_info) }
+  .debug_abbrev   0 : { *(.debug_abbrev) }
+  .debug_line     0 : { *(.debug_line) }
+  .debug_frame    0 : { *(.debug_frame) }
+  .debug_str      0 : { *(.debug_str) }
+  .debug_loc      0 : { *(.debug_loc) }
+  .debug_macinfo  0 : { *(.debug_macinfo) }
+  .debug_macro    0 : { *(.debug_macro*) }
+  .debug_ranges   0 : { *(.debug_ranges) }
+  /* SGI/MIPS DWARF 2 extensions */
+  .debug_weaknames 0 : { *(.debug_weaknames) }
+  .debug_funcnames 0 : { *(.debug_funcnames) }
+  .debug_typenames 0 : { *(.debug_typenames) }
+  .debug_varnames  0 : { *(.debug_varnames) }
+
   /DISCARD/ :
   {
-    *(.rel.reloc)
-    *(.eh_frame)
     *(.note.GNU-stack)
+    *(.GCC.command.line)
+    *(.gnu.version_d)
+    *(.gnu.version_r)
+    *(.gnu.version)
   }
   .comment 0 : { *(.comment) }
 }
