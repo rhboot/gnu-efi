@@ -63,11 +63,18 @@ SECTIONS
 
    /* the EFI loader doesn't seem to like a .bss section, so we stick
       it all into .data: */
+   . = ALIGN(4096);
+   _bss = .;
+   _bstart = .;
    *(.sbss)
    *(.scommon)
    *(.dynbss)
    *(.bss)
    *(COMMON)
+   . = ALIGN(4096);
+   _bss_end = .;
+   _bend = .;
+   _bsize = _bend - _bstart;
   }
   .note.gnu.build-id : { *(.note.gnu.build-id) }
 

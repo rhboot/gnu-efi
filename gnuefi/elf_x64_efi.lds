@@ -66,14 +66,16 @@ SECTIONS
       it all into .data: */
    . = ALIGN(4096);
    _bss = .;
+   _bstart = .;
    *(.sbss)
    *(.scommon)
    *(.dynbss)
    *(.bss)
    *(COMMON)
-   *(.rel.local)
    . = ALIGN(4096);
    _bss_end = .;
+   _bend = .;
+   _bsize = _bend - _bstart;
   }
   .note.gnu.build-id : { *(.note.gnu.build-id) }
 
