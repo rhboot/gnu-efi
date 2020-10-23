@@ -132,12 +132,13 @@ EXPORT_LDFLAGS ?=
 
 ifeq ($(ARCH),ia64)
   EXPORT_CFLAGS += -mfixed-range=f32-f127
+  EXPORT_LDFLAGS += -m elf64_ia64
   ARCH_ALIASES =
 endif
 
 ifeq ($(ARCH),ia32)
   EXPORT_CFLAGS += -mno-mmx -mno-sse
-  EXPORT_LDFLAGS += --no-ld-generated-unwind-info
+  EXPORT_LDFLAGS += --no-ld-generated-unwind-info -m elf_i386
   ifeq ($(HOSTARCH),x64)
     ARCH3264 = -m32
   endif
@@ -161,7 +162,7 @@ ifeq ($(ARCH),x64)
   endif
 
   EXPORT_CFLAGS += -mno-red-zone
-  EXPORT_LDFLAGS += --no-ld-generated-unwind-info
+  EXPORT_LDFLAGS += --no-ld-generated-unwind-info -m elf_x86_64
   ifeq ($(HOSTARCH),ia32)
     ARCH3264 = -m64
   endif
@@ -178,18 +179,20 @@ endif
 
 ifeq ($(ARCH),mips64el)
   EXPORT_CFLAGS += -march=mips64r2 -EL
-  EXPORT_LDFLAGS += -EL
+  EXPORT_LDFLAGS += -EL -m elf64ltsmip
   ARCH3264 = -mabi=64
   ARCH_ALIASES =
 endif
 
 ifeq ($(ARCH),aa64)
   ARCH_ALIASES = aarch64
+  EXPORT_LDFLAGS += aarch64elf
 endif
 
 ifeq ($(ARCH),arm)
   ARCH_ALIASES = armv6 armv7
   EXPORT_CFLAGS += -marm
+  EXPORT_LDFLAGS += armelf_linux_eabi
 endif
 
 #
@@ -234,7 +237,7 @@ endif
 ASFLAGS += $(ARCH3264)
 EXPORT_LDFLAGS += -nostdlib --warn-common --no-undefined --fatal-warnings \
 		  --build-id=sha1 --no-eh-frame-hdr \
-		  --orphan-handling=error
+		  --orphan-handling=place
 LDFLAGS += $(EXPORT_LDFLAGS)
 
 ifneq ($(ARCH),arm)

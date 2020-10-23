@@ -35,12 +35,19 @@
 #
 
 %.efi: %.so
-	$(OBJCOPY) -j .text -j .sdata -j .data -j .dynamic -j .dynsym -j .rel \
-		    -j .rela -j .rel.* -j .rela.* -j .rel* -j .rela* \
-		    -j .reloc $(FORMAT) $*.so $@
+	$(OBJCOPY) \
+		--file-alignment 512 --section-alignment 4096 \
+		-j .text -j .sdata -j .data -j .dynamic -j .dynsym -j .rel \
+		-j .rela -j '.rel.*' -j '.rela.*' -j '.rel*' -j '.rela*' \
+		-j .reloc \
+		-j '.debug*' -j '.eh_frame*' -j .note.gnu.build-id \
+		$(FORMAT) $*.so $@
 
 %.efi.debug: %.so
-	$(OBJCOPY) $(FORMAT) $*.so $@
+	$(OBJCOPY) \
+		--file-alignment 512 --section-alignment 4096 \
+		-j '.debug*' -j '.eh_frame*' -j .note.gnu.build-id \
+		$(FORMAT) $*.so $@
 
 %.so: %.o
 	$(LD) $(LDFLAGS) $^ -o $@ $(LOADLIBES)

@@ -43,8 +43,8 @@ extern unsigned long _DYNAMIC;
 static void EFIAPI ctors(UINTN ldbase);
 static void EFIAPI dtors(UINTN ldbase);
 
-extern EFI_STATUS _relocate(unsigned long ldbase, Elf_Dyn *dyn,
-			    EFI_HANDLE image, EFI_SYSTEM_TABLE *systab);
+extern EFI_STATUS EFIAPI _relocate(unsigned long ldbase, Elf_Dyn *dyn,
+				   EFI_HANDLE image, EFI_SYSTEM_TABLE *systab);
 
 EFI_STATUS EFIAPI
 _start(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab)
@@ -156,6 +156,12 @@ static void EFIAPI dtors(UINTN ldbase)
  * Hand-craft a dummy .reloc section so EFI knows it's a relocatable
  * executable:
  */
+#if defined(__i386__) && 0
+__asm__(".section .reloc, \"a\", @0\n"
+	".4byte 0\n"
+	".4byte 0\n"
+	".2byte 0\n");
+#elif 0
 struct
 	__attribute__((__packed__))
 	reloc
@@ -166,6 +172,7 @@ struct
 };
 
 struct reloc __attribute__((__section__(".reloc"))) dotreloc = {0, 10, 0};
+#endif
 
 static void
 __attribute__((__unused__))
@@ -189,6 +196,8 @@ printval_(EFI_SYSTEM_TABLE *systab, int size, uint64_t value)
 	case 8:
 	default:
 		shift = 60;
+		if (!(value & 0xffffffff00000000ull))
+			shift >>= 1;
 		break;
 	}
 	mask = 0xfull << shift;

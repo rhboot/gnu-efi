@@ -75,10 +75,11 @@ _EFI_CCLDLIBS = $(subst $(_efi_space),$(_efi_comma),-Wl --start-group $(foreach 
 
 EFI_BIN_SECTIONS ?= .text .sdata .data .dynamic .dynsym \
 		    .rel .rel.* .rela .rela.* .reloc \
-		    .eh_frame .note.gnu.build-id .ctf \
+		    .eh_frame* .note.gnu.build-id .ctf \
+		    .debug* \
 		    $(EFI_ARCH_BIN_SECTIONS)
 
-EFI_DEBUG_SECTIONS ?= .debug* .eh_frame .note.gnu.build-id .ctf \
+EFI_DEBUG_SECTIONS ?= .debug* .eh_frame* .note.gnu.build-id .ctf \
 		      $(EFI_ARCH_DEBUG_SECTIONS)
 EFI_OBJCOPY_FLAGS ?= --file-alignment 512 --section-alignment 4096 -D
 
@@ -87,7 +88,7 @@ ifneq ($(EFI_OBJCOPY_GTE224),1)
         $(error objcopy >= 2.24 is required)
 endif
 	$(OBJCOPY) $(EFI_OBJCOPY_FLAGS) \
-		$(foreach x,$(EFI_BIN_SECTIONS),-j $(x)) \
+		$(foreach x,$(EFI_BIN_SECTIONS),-j "$(x))" \
 		$(EFI_ARCH_FORMAT) $*.efi.so $@
 
 %.efi.debug : %.efi.so
@@ -95,7 +96,7 @@ ifneq ($(EFI_OBJCOPY_GTE224),1)
         $(error objcopy >= 2.24 is required)
 endif
 	$(OBJCOPY) $(EFI_OBJCOPY_FLAGS) \
-		$(foreach x,$(EFI_DEBUG_SECTIONS),-j $(x)) \
+		$(foreach x,$(EFI_DEBUG_SECTIONS),-j "$(x)") \
 		$(EFI_ARCH_FORMAT) $*.efi.so $@
 
 %.efi.a :

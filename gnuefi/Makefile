@@ -54,6 +54,7 @@ reloc_aa64.o: CFLAGS += -fno-jump-tables
 
 crt0.debug : crt0-efi-$(ARCH).o
 	$(OBJCOPY) \
+		--file-alignment 512 --section-alignment 4096 \
 		--only-keep-debug \
 		$(FORMAT) $^ $@
 
@@ -76,10 +77,10 @@ ifneq (,$(findstring FreeBSD,$(OS)))
  ifeq ($(ARCH),x64)
 	@$(INSTALL) -v -m 644 $(SRCDIR)/elf_$(ARCH)_fbsd_efi.lds $(INSTALLROOT)$(LIBDIR)/gnuefi/$(ARCH)/efi.lds
  else
-	@$(INSTALL) -v -m 644 $(SRCDIR)/elf_$(ARCH)_efi.lds $(INSTALLROOT)$(LIBDIR)/gnuefi/$(ARCH)/efi.lds
+	@$(INSTALL) -v -m 644 $(SRCDIR)/efi.lds $(INSTALLROOT)$(LIBDIR)/gnuefi/$(ARCH)/efi.lds
  endif
 else
-	@$(INSTALL) -v -m 644 $(SRCDIR)/elf_$(ARCH)_efi.lds $(INSTALLROOT)$(LIBDIR)/gnuefi/$(ARCH)/efi.lds
+	@$(INSTALL) -v -m 644 $(SRCDIR)/efi.lds $(INSTALLROOT)$(LIBDIR)/gnuefi/$(ARCH)/efi.lds
 endif
 
 install_compat: install
