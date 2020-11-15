@@ -73,5 +73,6 @@ Revision History
 #include "efiudp.h"
 #include "efitcp.h"
 #include "efipoint.h"
+#include "efishell.h"
 
 #endif

@@ -28,7 +28,7 @@ Revision History
 typedef struct _LIST_ENTRY {
     struct _LIST_ENTRY  *Flink;
     struct _LIST_ENTRY  *Blink;
-} LIST_ENTRY;
+} LIST_ENTRY, EFI_LIST_ENTRY;
 
 #endif 
 
