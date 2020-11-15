@@ -169,6 +169,7 @@ extern EFI_GUID gEfiDebugSupportProtocolGuid;
 extern EFI_GUID SimpleTextInputExProtocol;
 
 extern EFI_GUID ShellProtocolGuid;
+extern EFI_GUID ShellParametersProtocolGuid;
 
 //
 // EFI Variable strings
