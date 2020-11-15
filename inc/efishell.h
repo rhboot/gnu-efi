@@ -419,4 +419,31 @@ typedef struct _EFI_SHELL_PARAMETERS_PROTOCOL {
     SHELL_FILE_HANDLE StdErr;
 } EFI_SHELL_PARAMETERS_PROTOCOL;
 
+#define EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL_GUID \
+    { 0x3c7200e9, 0x005f, 0x4ea4, { 0x87, 0xde, 0xa3, 0xdf, 0xac, 0x8a, 0x27, 0xc3 } }
+
+INTERFACE_DECL(_EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL);
+
+typedef
+SHELL_STATUS
+(EFIAPI *SHELL_COMMAND_HANDLER)(
+    IN struct _EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL *This,
+    IN EFI_SYSTEM_TABLE                           *SystemTable,
+    IN EFI_SHELL_PARAMETERS_PROTOCOL              *ShellParameters,
+    IN EFI_SHELL_PROTOCOL                         *Shell
+    );
+
+typedef
+CHAR16*
+(EFIAPI *SHELL_COMMAND_GETHELP)(
+    IN struct _EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL *This,
+    IN CONST CHAR8                                *Language
+    );
+
+typedef struct _EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL {
+    CONST CHAR16          *CommandName;
+    SHELL_COMMAND_HANDLER Handler;
+    SHELL_COMMAND_GETHELP GetHelp;
+} EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL;
+
 #endif
