@@ -58,6 +58,11 @@ stripped = $(subst $(space),/,$(strip $(subst /,$(space),$(1))))
 unstripped = $(subst $(space),/,$(subst /,$(space),$(1)))
 is_absolute = $(subst $(call stripped,$(1)),$(empty),$(call unstripped,$(1)))
 
+noop =
+info_ = $(info $(1))
+debugmk = $(call $(if $(DEBUG),$(info_),$(noop)),$(1))
+verbose = $(call $(if $(DEBUG)$(VERBOSE),$(info_),$(noop)),$(1))
+
 override INSTALLROOT:=$(if $(call is_absolute,$(INSTALLROOT)),,$(TOPDIR)/)$(INSTALLROOT)
 
 PREFIX       := /usr/local
@@ -84,29 +89,21 @@ HOSTARCH     ?= $(shell $(HOSTCC) -dumpmachine | cut -f1 -d- | sed \
 			-e 's,armv[[:digit:]].*,arm,' \
 			-e 's,mips64.*,mips64el,g' \
 			)
-ARCH         ?= $(shell $(HOSTCC) -dumpmachine | cut -f1 -d- | sed \
+ARCH         ?= $(shell $(CC) -dumpmachine | cut -f1 -d-)
+override ARCH := $(shell echo $(ARCH) | sed \
 			-e s,i[3456789]86,ia32, \
 			-e s,amd64,x64, -e s,x86_64,x64, \
 			-e s,aarch64,aa64, \
 			-e 's,armv[[:digit:]].*,arm,' \
 			-e 's,mips64.*,mips64el,g' \
 			)
-BFD_ARCH     ?= $(shell $(HOSTCC) -dumpmachine | cut -f1 -d- | sed \
+BFD_ARCH     ?= $(echo "$(ARCH)" | cut -f1 -d- | sed \
 			-e s,i[3456789]86,ia32, \
 			-e s,amd64,x86_64, \
 			-e 's,armv[[:digit:]].*,arm,' \
 			)
+$(call verbose,HOSTARCH:$(HOSTARCH) ARCH:$(ARCH) BFD_ARCH:$(BFD_ARCH))
 
-# Get ARCH from the compiler if cross compiling
-ifneq ($(CROSS_COMPILE),)
-  override ARCH := $(shell $(CC) -dumpmachine | cut -f1 -d- | sed \
-			-e s,i[3456789]86,ia32, \
-			-e s,amd64,x64, -e s,x86_64,x64, \
-			-e s,aarch64,aa64, \
-			-e 's,armv[[:digit:]].*,arm,' \
-			-e 's,mips64.*,mips64el,g' \
-			)
-endif
 
 #
 # Where to build the package
