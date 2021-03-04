@@ -90,19 +90,21 @@ HOSTARCH     ?= $(shell $(HOSTCC) -dumpmachine | cut -f1 -d- | sed \
 			-e 's,mips64.*,mips64el,g' \
 			)
 ARCH         ?= $(shell $(CC) -dumpmachine | cut -f1 -d-)
-override ARCH := $(shell echo $(ARCH) | sed \
-			-e s,i[3456789]86,ia32, \
-			-e s,amd64,x64, -e s,x86_64,x64, \
-			-e s,aarch64,aa64, \
-			-e 's,armv[[:digit:]].*,arm,' \
-			-e 's,mips64.*,mips64el,g' \
-			)
-BFD_ARCH     ?= $(echo "$(ARCH)" | cut -f1 -d- | sed \
+EFI_BFD_ARCH     ?= $(shell echo $(ARCH) | sed \
 			-e s,i[3456789]86,ia32, \
 			-e s,amd64,x86_64, \
 			-e 's,armv[[:digit:]].*,arm,' \
 			)
-$(call verbose,HOSTARCH:$(HOSTARCH) ARCH:$(ARCH) BFD_ARCH:$(BFD_ARCH))
+override EFI_BFD_ARCH := $(EFI_BFD_ARCH)
+override ARCH := $(shell echo $(ARCH) | sed \
+			-e s,i[3456789]86,ia32, \
+			-e s,amd64,x64, \
+			-e s,x86_64,x64, \
+			-e s,aarch64,aa64, \
+			-e 's,armv[[:digit:]].*,arm,' \
+			-e 's,mips64.*,mips64el,g' \
+			)
+$(call verbose,HOSTARCH:$(HOSTARCH) ARCH:$(ARCH) BFDARCH:$(EFI_BFD_ARCH))
 
 
 #
@@ -162,7 +164,7 @@ endif
 
 ifeq ($(ARCH),mips64el)
   CFLAGS += -march=mips64r2 -EL
-  LDFLAGS += -EL
+  LDFLAGS += -Wl,-EL
   ARCH3264 = -mabi=64
 endif
 
@@ -214,9 +216,10 @@ ARFLAGS := rDv
 endif
 
 ASFLAGS += $(ARCH3264)
-LDFLAGS	+= -nostdlib --warn-common --no-undefined --fatal-warnings \
-	   --build-id=sha1
+LDFLAGS	+= -Wl,-nostdlib -Wl,--warn-common -Wl,--no-undefined \
+	   -Wl,--fatal-warnings -Wl,--build-id=sha1
 
 ifneq ($(ARCH),arm)
 export LIBGCC=$(shell $(CC) $(CFLAGS) $(ARCH3264) -print-libgcc-file-name)
 endif
+export

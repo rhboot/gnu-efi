@@ -51,7 +51,8 @@ ifneq (,$(findstring FreeBSD,$(OS)))
 LDSCRIPT	= $(TOPDIR)/gnuefi/elf_$(ARCH)_fbsd_efi.lds
 endif
 
-LDFLAGS		+= -shared -Bsymbolic -L$(TOPDIR)/$(ARCH)/lib -L$(TOPDIR)/$(ARCH)/gnuefi $(CRTOBJS)
+LDFLAGS		+= -shared -Wl,-shared -Wl,-Bsymbolic \
+		   -L$(TOPDIR)/$(ARCH)/lib -L$(TOPDIR)/$(ARCH)/gnuefi $(CRTOBJS)
 
 LOADLIBES	+= -lefi -lgnuefi
 LOADLIBES	+= $(LIBGCC)
@@ -68,9 +69,9 @@ TARGET_RTDRIVERS =
 
 ifneq ($(HAVE_EFI_OBJCOPY),)
 
-FORMAT		:= --target efi-app-$(EFI_BFDARCH)
-$(TARGET_BSDRIVERS): FORMAT=--target efi-bsdrv-$(EFI_BFDARCH)
-$(TARGET_RTDRIVERS): FORMAT=--target efi-rtdrv-$(EFI_BFDARCH)
+FORMAT		= --target efi-app-$(EFI_BFD_ARCH)
+$(TARGET_BSDRIVERS): FORMAT=--target efi-bsdrv-$(EFI_BFD_ARCH)
+$(TARGET_RTDRIVERS): FORMAT=--target efi-rtdrv-$(EFI_BFD_ARCH)
 
 else
 
@@ -78,8 +79,8 @@ SUBSYSTEM	:= 0xa
 $(TARGET_BSDRIVERS): SUBSYSTEM = 0xb
 $(TARGET_RTDRIVERS): SUBSYSTEM = 0xc
 
-FORMAT		:= -O binary
-LDFLAGS		+= --defsym=EFI_SUBSYSTEM=$(SUBSYSTEM)
+FORMAT		= -O binary
+LDFLAGS		+= -Wl,--defsym=EFI_SUBSYSTEM=$(SUBSYSTEM)
 
 endif
 

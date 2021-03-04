@@ -45,7 +45,7 @@ during the build.
 One of \fIaa64\fR, \fIarm\fR, \fIia32\fR, \fIia64\fR, \fIx64\fR, or
 \fImips64el\fR, representing the \fBEFI\fR architecture name of the target.
 .TP
-.B \fBEFI_BFDARCH\fR
+.B \fBEFI_BFD_ARCH\fR
 The architecture name for the BFD target for objcopy.
 .TP
 .B \fBEFI_ARCH_3264\fR

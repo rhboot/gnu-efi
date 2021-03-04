@@ -32,7 +32,7 @@ EFI_ARCH ?= $(shell $(EFI_CC) -dumpmachine | cut -f1 -d- | \
                         -e s,aarch64,aa64, \
 			-e 's,armv[[:digit:]].*,arm,' \
                         )
-EFI_BFDARCH ?= $(shell $(EFI_CC) -dumpmachine | cut -f1 -d- | \
+EFI_BFD_ARCH ?= $(shell $(EFI_CC) -dumpmachine | cut -f1 -d- | \
 		sed \
 			-e s,i[3456789]86,ia32, \
                         -e s,amd64,x86_64, \
@@ -119,7 +119,7 @@ export EFI_ARCH_CCLDFLAGS EFI_ARCH_CFLAGS EFI_ARCH_CPPFLAGS EFI_ARCH_LDFLAGS
 export EFI_ARCH_CLANG_BUGS EFI_ARCH_CAN_DISABLE_AVX
 export EFI_ARCH_FORMAT EFI_ARCH_SUBSYSTEM EFI_ARCH_SUFFIX EFI_ARCH_SUFFIX_UPPER
 export EFI_ARCH_TIMESTAMP_LOCATION EFI_ARCH_3264
-export EFI_ARFLAGS EFI_ASFLAGS EFI_BFDARCH EFI_CC EFI_CFLAGS EFI_CPPFLAGS
+export EFI_ARFLAGS EFI_ASFLAGS EFI_BFD_ARCH EFI_CC EFI_CFLAGS EFI_CPPFLAGS
 export EFI_LDFLAGS EFI_LDSCRIPT EFI_HOSTARCH EFI_HOSTCC EFI_INCLUDES
 export EFI_LIBGCC EFI_LIBS
 
