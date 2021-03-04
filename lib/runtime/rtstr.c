@@ -23,11 +23,14 @@ Revision History
 INTN
 RUNTIMEFUNCTION
 RtStrCmp (
-    IN CONST CHAR16   *s1,
-    IN CONST CHAR16   *s2
+    IN CONST CHAR16   *s1p,
+    IN CONST CHAR16   *s2p
     )
 // compare strings
 {
+    CONST UINT16 *s1 = (CONST UINT16 *)s1p;
+    CONST UINT16 *s2 = (CONST UINT16 *)s2p;
+
     while (*s1) {
         if (*s1 != *s2) {
             break;

@@ -387,13 +387,13 @@ strlena (
     IN CONST CHAR8    *s1
     );
 
-UINTN
+INTN
 strcmpa (
     IN CONST CHAR8    *s1,
     IN CONST CHAR8    *s2
     );
 
-UINTN
+INTN
 strncmpa (
     IN CONST CHAR8    *s1,
     IN CONST CHAR8    *s2,

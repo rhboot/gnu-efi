@@ -20,22 +20,28 @@ Revision History
 
 INTN
 StrCmp (
-    IN CONST CHAR16   *s1,
-    IN CONST CHAR16   *s2
+    IN CONST CHAR16   *s1p,
+    IN CONST CHAR16   *s2p
     )
 // compare strings
 {
+    CONST UINT16 *s1 = (CONST UINT16 *)s1p;
+    CONST UINT16 *s2 = (CONST UINT16 *)s2p;
+
     return RtStrCmp(s1, s2);
 }
 
 INTN
 StrnCmp (
-    IN CONST CHAR16   *s1,
-    IN CONST CHAR16   *s2,
+    IN CONST CHAR16   *s1p,
+    IN CONST CHAR16   *s2p,
     IN UINTN    len
     )
 // compare strings
 {
+    CONST UINT16 *s1 = (CONST UINT16 *)s1p;
+    CONST UINT16 *s2 = (CONST UINT16 *)s2p;
+
     while (*s1  &&  len) {
         if (*s1 != *s2) {
             break;
@@ -222,13 +228,16 @@ strlena (
     return len;
 }
 
-UINTN
+INTN
 strcmpa (
-    IN CONST CHAR8    *s1,
-    IN CONST CHAR8    *s2
+    IN CONST CHAR8    *s1p,
+    IN CONST CHAR8    *s2p
     )
 // compare strings
 {
+    CONST UINT8 *s1 = (CONST UINT8 *)s1p;
+    CONST UINT8 *s2 = (CONST UINT8 *)s2p;
+
     while (*s1) {
         if (*s1 != *s2) {
             break;
@@ -241,14 +250,17 @@ strcmpa (
     return *s1 - *s2;
 }
 
-UINTN
+INTN
 strncmpa (
-    IN CONST CHAR8    *s1,
-    IN CONST CHAR8    *s2,
+    IN CONST CHAR8    *s1p,
+    IN CONST CHAR8    *s2p,
     IN UINTN    len
     )
 // compare strings
 {
+    CONST UINT8 *s1 = (CONST UINT8 *)s1p;
+    CONST UINT8 *s2 = (CONST UINT8 *)s2p;
+
     while (*s1  &&  len) {
         if (*s1 != *s2) {
             break;
