@@ -124,7 +124,7 @@ section_table:
 
 
 	.ascii	".sbat\0\0\0"
-	.long	_sbat_size		// VirtualSize
+	.long	_sbat_vsize		// VirtualSize
 	.long	_sbat - ImageBase	// VirtualAddress
 	.long	_sbat_size		// SizeOfRawData
 	.long	_sbat - ImageBase	// PointerToRawData

@@ -110,7 +110,7 @@ section_table:
 	.long	0xc0000040	// Characteristics (section flags)
 
 	.ascii  ".sbat\0\0\0"
-	.long	_sbat_size		// VirtualSize
+	.long	_sbat_vsize		// VirtualSize
 	.long	_sbat - ImageBase	// VirtualAddress
 	.long	_sbat_size		// SizeOfRawData
 	.long	_sbat - ImageBase	// PointerToRawData
