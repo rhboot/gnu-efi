@@ -246,7 +246,7 @@ LibGetVariableAndSize (
     OUT UINTN               *VarSize
     )
 {
-    EFI_STATUS              Status;
+    EFI_STATUS              Status = EFI_SUCCESS;
     VOID                    *Buffer;
     UINTN                   BufferSize;
 
