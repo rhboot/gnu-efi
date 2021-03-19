@@ -156,7 +156,9 @@ endif
 ifneq ($(ARCH),aarch64)
 ifneq ($(ARCH),arm)
 ifneq ($(ARCH),mips64el)
+ifneq ($(ARCH),riscv64)
 export HAVE_EFI_OBJCOPY=y
+endif
 endif
 endif
 endif

@@ -32,6 +32,8 @@ Revision History
 #include "arm/efilibplat.h"
 #elif defined (_M_MIPS64) || defined(__mips64__)
 #include "mips64el/efilibplat.h"
+#elif defined (__riscv) && __riscv_xlen == 64
+#include "riscv64/efilibplat.h"
 #endif
 
 
