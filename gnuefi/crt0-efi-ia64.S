@@ -82,6 +82,6 @@ _start_plabel:
 
 	.section .reloc, "a"
 	data4	_start_plabel				// Page RVA
-	data4	12					// Block Size (2*4+2*2)
+	data4	12					// Block Size (2*4+2*2), must be aligned by 32 Bits
 	data2	(IMAGE_REL_BASED_DIR64<<12) +  0	// reloc for plabel's entry point
 	data2	(IMAGE_REL_BASED_DIR64<<12) +  8	// reloc for plabel's global pointer
