@@ -610,6 +610,7 @@ LibReinstallProtocolInterfaces (
 
         Index += 1;
     }
+    va_end (args);
 
     //
     // If there was an error, undo all the interfaces that were
@@ -627,7 +628,8 @@ LibReinstallProtocolInterfaces (
             uefi_call_wrapper(BS->ReinstallProtocolInterface, 4, Handle, Protocol, NewInterface, OldInterface);
 
             Index -= 1;
-        }        
+        }
+        va_end (args);
     }
 
     //
