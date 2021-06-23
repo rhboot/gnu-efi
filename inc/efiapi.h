@@ -343,6 +343,18 @@ EFI_STATUS
 #define EFI_IMAGE_MACHINE_AARCH64   0xAA64
 #endif
 
+#if !defined(EFI_IMAGE_MACHINE_RISCV32)
+#define EFI_IMAGE_MACHINE_RISCV32   0x5032
+#endif
+
+#if !defined(EFI_IMAGE_MACHINE_RISCV64)
+#define EFI_IMAGE_MACHINE_RISCV64   0x5064
+#endif
+
+#if !defined(EFI_IMAGE_MACHINE_RISCV128)
+#define EFI_IMAGE_MACHINE_RISCV128  0x5128
+#endif
+
 // Image Entry prototype
 
 typedef 
