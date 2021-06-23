@@ -85,6 +85,7 @@ draw_boxes(EFI_GRAPHICS_OUTPUT_PROTOCOL *gop)
 				  info->HorizontalResolution,
 				  info->VerticalResolution,
 				  0);
+		FreePool(PixelBuffer);
 		return;
 	}
 	Print(L"Never found the active video mode?\n");
