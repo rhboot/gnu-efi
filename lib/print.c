@@ -1377,7 +1377,7 @@ ValueToString (
         *(p1++) = (CHAR8)r + '0';
     }
 
-    c = (Comma ? ca[(p1 - str) % 3] : 999) + 1;
+    c = (UINTN) (Comma ? ca[(p1 - str) % 3] : 999) + 1;
     while (p1 != str) {
 
         c -= 1;
