@@ -38,7 +38,7 @@ coff_header:
 	.short	2				// nr_sections
 	.long	0 				// TimeDateStamp
 	.long	0				// PointerToSymbolTable
-	.long	1				// NumberOfSymbols
+	.long	0				// NumberOfSymbols
 	.short	section_table - optional_header	// SizeOfOptionalHeader
 	.short	0x206				// Characteristics.
 						// IMAGE_FILE_DEBUG_STRIPPED |
