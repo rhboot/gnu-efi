@@ -28,13 +28,11 @@ typedef int64_t                 INT64;
 typedef uint32_t                UINT32;
 typedef int32_t                 INT32;
 typedef uint16_t                UINT16;
+typedef uint16_t                CHAR16;
 typedef int16_t                 INT16;
 typedef uint8_t                 UINT8;
 typedef int8_t                  INT8;
-#ifndef __WCHAR_TYPE__
-#define __WCHAR_TYPE__          short
-#endif
-typedef __WCHAR_TYPE__          WCHAR;
+typedef char                    CHAR8;
 #ifndef BOOLEAN
 typedef uint8_t                 BOOLEAN;
 #endif
