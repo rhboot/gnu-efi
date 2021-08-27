@@ -35,7 +35,7 @@ pe_header:
 	.short 	0
 coff_header:
 	.short	0x5064				// riscv64
-	.short	2				// nr_sections
+	.short	4				// nr_sections
 	.long	0 				// TimeDateStamp
 	.long	0				// PointerToSymbolTable
 	.long	0				// NumberOfSymbols
@@ -66,7 +66,7 @@ extra_header_fields:
 	.short	0				// MinorSubsystemVersion
 	.long	0				// Win32VersionValue
 
-	.long	_edata - ImageBase		// SizeOfImage
+	.long	_erodata - ImageBase		// SizeOfImage
 
 	// Everything before the kernel image is considered part of the header
 	.long	_start - ImageBase		// SizeOfHeaders
@@ -94,28 +94,53 @@ section_table:
 	 * because EFI applications must be relocatable.  This is a
 	 * dummy section as far as we are concerned.
 	 */
-	.ascii	".reloc\0\0"
-	.long	0
-	.long	0
-	.long	0				// SizeOfRawData
-	.long	0				// PointerToRawData
-	.long	0				// PointerToRelocations
-	.long	0				// PointerToLineNumbers
-	.short	0				// NumberOfRelocations
-	.short	0				// NumberOfLineNumbers
-	.long	0x42100040			// Characteristics (section flags)
-
 	.ascii	".text\0\0\0"
-	.long	_edata - _start			// VirtualSize
-	.long	_start - ImageBase		// VirtualAddress
-	.long	_edata - _start			// SizeOfRawData
-	.long	_start - ImageBase		// PointerToRawData
+	.long	_evtext - _start	// VirtualSize
+	.long	_start - ImageBase	// VirtualAddress
+	.long	_etext - _start		// SizeOfRawData
+	.long	_start - ImageBase	// PointerToRawData
 
-	.long	0				// PointerToRelocations (0 for executables)
-	.long	0				// PointerToLineNumbers (0 for executables)
-	.short	0				// NumberOfRelocations  (0 for executables)
-	.short	0				// NumberOfLineNumbers  (0 for executables)
-	.long	0xe0500020			// Characteristics (section flags)
+	.long	0			// PointerToRelocations
+	.long	0			// PointerToLineNumbers
+	.short	0			// NumberOfRelocations
+	.short	0			// NumberOfLineNumbers
+	.long	0x60000020		// Characteristics (section flags)
+
+	.ascii	".data\0\0\0"
+	.long	_evdata - _data		// VirtualSize
+	.long	_data - ImageBase	// VirtualAddress
+	.long	_edata - _data		// SizeOfRawData
+	.long	_data - ImageBase	// PointerToRawData
+
+	.long	0			// PointerToRelocations (0 for executables)
+	.long	0			// PointerToLineNumbers (0 for executables)
+	.short	0			// NumberOfRelocations  (0 for executables)
+	.short	0			// NumberOfLineNumbers  (0 for executables)
+	.long	0xc0000040		// Characteristics (section flags)
+
+	.ascii	".sbat\0\0\0"
+	.long	_epsbat - _sbat		// VirtualSize
+	.long	_sbat - ImageBase	// VirtualAddress
+	.long	_esbat - _sbat		// SizeOfRawData
+	.long	_sbat - ImageBase	// PointerToRawData
+
+	.long	0			// PointerToRelocations (0 for executables)
+	.long	0			// PointerToLineNumbers (0 for executables)
+	.short	0			// NumberOfRelocations  (0 for executables)
+	.short	0			// NumberOfLineNumbers  (0 for executables)
+	.long	0x40000040		// Characteristics (section flags)
+
+	.ascii	".reloc\0\0"
+	.long	_evrodata -_rodata	// VirtualSize
+	.long	_rodata - ImageBase	// VirtualAddress
+	.long	_erodata - _rodata	// SizeOfRawData
+	.long	_rodata - ImageBase	// PointerToRawData
+
+	.long	0			// PointerToRelocations (0 for executables)
+	.long	0			// PointerToLineNumbers (0 for executables)
+	.short	0			// NumberOfRelocations  (0 for executables)
+	.short	0			// NumberOfLineNumbers  (0 for executables)
+	.long	0x42000040		// Characteristics (section flags)
 
 	.align	12
 	.globl _start
