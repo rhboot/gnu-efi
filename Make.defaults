@@ -153,11 +153,9 @@ endif
 # Set HAVE_EFI_OBJCOPY if objcopy understands --target efi-[app|bsdrv|rtdrv],
 # otherwise we need to compose the PE/COFF header using the assembler
 #
-ifneq ($(ARCH),aarch64)
 ifneq ($(ARCH),arm)
 ifneq ($(ARCH),mips64el)
 export HAVE_EFI_OBJCOPY=y
-endif
 endif
 endif
 
