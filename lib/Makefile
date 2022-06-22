@@ -74,6 +74,8 @@ all: libsubdirs libefi.a
 libsubdirs:
 	@set -e ; for sdir in $(SUBDIRS); do mkdir -p $$sdir; done
 
+$(OBJS): libsubdirs
+
 libefi.a: $(OBJS)
 	$(AR) $(ARFLAGS) $@ $^
 
@@ -92,5 +94,3 @@ install_compat: install
 	$(SYMLINK) gnuefi/$(ARCH)/libefi.a $(INSTALLROOT)$(LIBDIR)/libefi.a
 
 include $(SRCDIR)/../Make.rules
-
-.PHONY: libsubdirs
