@@ -48,6 +48,11 @@ EFI_STATUS _relocate (long ldbase, Elf64_Dyn *dyn,
 	unsigned long *addr;
 	int i;
 
+	/*
+	 * We need this code to not be on the same page as any relocations.
+	 */
+	__asm__(".balign 4096\n");
+
 	for (i = 0; dyn[i].d_tag != DT_NULL; ++i) {
 		switch (dyn[i].d_tag) {
 			case DT_RELA:
