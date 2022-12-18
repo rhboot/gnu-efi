@@ -85,3 +85,7 @@ _start_plabel:
 	data4	12					// Block Size (2*4+2*2)
 	data2	(IMAGE_REL_BASED_DIR64<<12) +  0	// reloc for plabel's entry point
 	data2	(IMAGE_REL_BASED_DIR64<<12) +  8	// reloc for plabel's global pointer
+
+#if defined(__ELF__) && defined(__linux__)
+	.section .note.GNU-stack,"",%progbits
+#endif
