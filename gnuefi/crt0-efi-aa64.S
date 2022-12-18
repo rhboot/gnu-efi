@@ -128,3 +128,7 @@ _start:
 
 0:	ldp		x29, x30, [sp], #32
 	ret
+
+#if defined(__ELF__) && defined(__linux__)
+	.section .note.GNU-stack,"",%progbits
+#endif

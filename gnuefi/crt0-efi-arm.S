@@ -143,3 +143,7 @@ _start:
 
 .L_DYNAMIC:
 	.word		_DYNAMIC - .
+
+#if defined(__ELF__) && defined(__linux__)
+	.section .note.GNU-stack,"",%progbits
+#endif
