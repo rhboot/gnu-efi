@@ -15,8 +15,7 @@ SECTIONS
   }
   _etext = .;
   _text_size = . - _text;
-  .dynamic  : { *(.dynamic) }
-  .data : ALIGN(4096)
+  .data : ALIGN(0x10000)
   {
    _data = .;
    *(.sdata)
@@ -68,11 +67,13 @@ SECTIONS
   _edata = .;
   _data_size = . - _data;
 
-  . = ALIGN(4096);
+  . = ALIGN(0x10000);
+  .dynamic  : { *(.dynamic) }
+  . = ALIGN(0x10000);
   .dynsym   : { *(.dynsym) }
-  . = ALIGN(4096);
+  . = ALIGN(0x10000);
   .dynstr   : { *(.dynstr) }
-  . = ALIGN(4096);
+  . = ALIGN(0x10000);
   .note.gnu.build-id : { *(.note.gnu.build-id) }
   /DISCARD/ :
   {
