@@ -82,6 +82,11 @@ LDFLAGS		+= --defsym=EFI_SUBSYSTEM=$(SUBSYSTEM)
 
 endif
 
+# On some archs, binutils can have a larger max page size. All our .lds
+# assume 4k however, and without this, they might end up blending .text
+# and .data into the same segment, making it RWE
+LDFLAGS 	+= -z max-page-size=4096
+
 TARGETS = $(TARGET_APPS) $(TARGET_BSDRIVERS) $(TARGET_RTDRIVERS)
 
 all:	$(TARGETS)
