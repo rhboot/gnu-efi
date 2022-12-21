@@ -15,7 +15,6 @@ SECTIONS
   }
   _etext = .;
   _text_size = . - _text;
-  .dynamic  : { *(.dynamic) }
   .data : ALIGN(4096)
   {
    _data = .;
@@ -60,6 +59,7 @@ SECTIONS
    _bss_end = .;
   }
 
+  .dynamic  : { *(.dynamic) }
   .rela.dyn : { *(.rela.dyn) }
   .rela.plt : { *(.rela.plt) }
   .rela.got : { *(.rela.got) }
