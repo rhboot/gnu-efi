@@ -41,3 +41,6 @@ _fini_array:
 _fini_array_end:
 	.long 0
 
+#if defined(__ELF__) && defined(__linux__)
+	.section .note.GNU-stack,"",%progbits
+#endif
