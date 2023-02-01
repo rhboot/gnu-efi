@@ -51,3 +51,4 @@ _start:
 	.4byte	.dummy1-.dummy0				// Page RVA
 	.4byte	10					// Block Size (2*4+2)
 	.2byte	(IMAGE_REL_ABSOLUTE<<12) +  0		// reloc for dummy
+	.section .note.GNU-stack,"a"

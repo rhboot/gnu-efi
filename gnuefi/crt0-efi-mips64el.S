@@ -186,3 +186,4 @@ _pc:
 	.end		_start
 
 	.set		pop
+	.section .note.GNU-stack,"a"

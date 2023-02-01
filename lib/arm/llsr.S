@@ -39,3 +39,4 @@ ASM_PFX(__aeabi_llsr):
     lsr      r0,r1,r3
     mov      r1,#0
     bx       lr
+	.section .note.GNU-stack,"a"

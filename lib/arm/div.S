@@ -153,3 +153,4 @@ label1:
   @ What to do about division by zero?  For now, just return.
 ASM_PFX(__aeabi_idiv0):
   bx      r14
+	.section .note.GNU-stack,"a"

@@ -23,3 +23,4 @@ setjmp:
 	.type	longjmp, %function
 longjmp:
 	ldmia	r0, {r3-r12,r14}
+	.section .note.GNU-stack,"a"

@@ -58,3 +58,4 @@ longjmp:
 	mov	w0, #1
 	csel	w0, w1, w0, ne
 	br	x30
+	.section .note.GNU-stack,"a"

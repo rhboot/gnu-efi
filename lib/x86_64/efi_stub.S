@@ -187,3 +187,4 @@ ENTRY(efi_call10)
 	ret
 
 #endif
+	.section .note.GNU-stack,"a"

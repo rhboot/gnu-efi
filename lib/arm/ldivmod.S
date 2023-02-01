@@ -59,3 +59,4 @@ L_Exit:
 
 
 
+	.section .note.GNU-stack,"a"

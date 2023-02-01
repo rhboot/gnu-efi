@@ -41,3 +41,4 @@ _start:
 hello:	.byte 'h',0,'e',0,'l',0,'l',0,'o',0,'\n',0,'\r',0,0,0
 
 #endif
+	.section .note.GNU-stack,"a"

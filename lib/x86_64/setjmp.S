@@ -46,3 +46,4 @@ longjmp:
 	cmp	%rax,%rdx
 	cmove	%rcx,%rax
 	jmp	*0x38(%rdi)
+	.section .note.GNU-stack,"a"

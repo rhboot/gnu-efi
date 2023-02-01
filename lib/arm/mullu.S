@@ -31,3 +31,4 @@ ASM_PFX(__aeabi_lmul):
   mla     r1, r2, r1, ip
   mla     r1, r3, lr, r1
   ldmia   sp!, {pc}
+	.section .note.GNU-stack,"a"

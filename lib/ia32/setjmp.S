@@ -43,3 +43,4 @@ longjmp:
 	movl	(%edx), %ebx
 	movl	4(%edx), %esi
 	movl	8(%edx), %edi
+	.section .note.GNU-stack,"a"

@@ -191,3 +191,4 @@ _start:
 
 .L_DYNAMIC:
 	.word		_DYNAMIC - .
+	.section .note.GNU-stack,"a"

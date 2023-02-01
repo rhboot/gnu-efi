@@ -90,3 +90,4 @@ longjmp:
 	li	$v0, 1
 	movn	$v0, $a1, $a1
 	jr	$ra
+	.section .note.GNU-stack,"a"

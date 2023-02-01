@@ -197,3 +197,4 @@ _skip_flushrs:
 	invala
 	mov		ar.rsc = r16
 	br.ret.sptk	b0
+	.section .note.GNU-stack,"a"

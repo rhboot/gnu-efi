@@ -225,3 +225,4 @@ apply_FPTR64:
 fptr_mem_base:
 	.space  MAX_FUNCTION_DESCRIPTORS*16
 fptr_mem_limit:
+	.section .note.GNU-stack,"a"

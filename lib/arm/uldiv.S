@@ -265,3 +265,4 @@ ASM_PFX(__aeabi_ldiv0):
   bx      r14
 
 
+	.section .note.GNU-stack,"a"

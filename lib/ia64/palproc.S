@@ -159,3 +159,4 @@ StackedComeBackFromPALCall:
 
 PROCEDURE_EXIT(MakeStackedPALCall)
 
+	.section .note.GNU-stack,"a"
