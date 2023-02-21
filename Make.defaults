@@ -205,7 +205,7 @@ endif
 
 ASFLAGS += $(ARCH3264)
 LDFLAGS	+= -nostdlib --warn-common --no-undefined --fatal-warnings \
-	   --build-id=sha1
+	   --build-id=sha1 --no-warn-rwx-segments
 
 ifneq ($(ARCH),arm)
 export LIBGCC=$(shell $(CC) $(CFLAGS) $(ARCH3264) -print-libgcc-file-name)
