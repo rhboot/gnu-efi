@@ -42,6 +42,6 @@ typedef struct {
 	UINT64	Predicates;
 	UINT64	LoopCount;
 	UINT64	FPSR;
-} ALIGN(JMPBUF_ALIGN) jmp_buf[1];
+} __attribute__((__aligned__(JMPBUF_ALIGN))) jmp_buf[1];
 
 #endif /* GNU_EFI_IA64_SETJMP_H */
