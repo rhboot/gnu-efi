@@ -184,7 +184,12 @@ ifneq "$(or $(IS_FREEBSD), $(IS_DARWIN))" ""
 CFLAGS  += $(ARCH3264) $(OPTIMIZATIONS) \
 	   $(WARNFLAGS) $(WERRFLAGS) \
            -fshort-wchar -fno-strict-aliasing \
-           -ffreestanding -fno-stack-protector
+           -ffreestanding -fno-stack-protector \
+           -fno-stack-check -nostdinc \
+           $(CFLAGS_LTO) $(CFLAGS_GCOV) \
+           -isystem $(TOPDIR)/../include/system \
+           -isystem $(shell $(CC) $(ARCH3264) -print-file-name=include) \
+           $(if $(findstring gcc,$(CC)),-fno-merge-all-constants,)
 else
 CFLAGS  += $(ARCH3264) $(OPTIMIZATIONS) \
 	   $(WARNFLAGS) $(WERRFLAGS) \
