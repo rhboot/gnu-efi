@@ -596,6 +596,14 @@ AsciiVSPrint(
     __builtin_ms_va_list args
 );
 
+UINTN EFIAPI
+AsciiSPrint (
+    OUT CHAR8         *Str,
+    IN UINTN          StrSize,
+    IN CONST CHAR8    *fmt,
+    ...
+    );
+
 VOID
 ValueToHex (
     IN CHAR16   *Buffer,
